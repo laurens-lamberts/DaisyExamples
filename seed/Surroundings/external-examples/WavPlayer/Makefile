@@ -1,8 +1,8 @@
 # Project Name
-TARGET = Surroundings
+TARGET = WavPlayer
 
 # Sources
-CPP_SOURCES = Surroundings.cpp
+CPP_SOURCES = WavPlayer.cpp
 
 # Library Locations
 LIBDAISY_DIR = ../../libDaisy
