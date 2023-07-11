@@ -79,7 +79,7 @@ int main(void)
     sdcard.Init(sd_cfg);
     fsi.Init(FatFSInterface::Config::MEDIA_SD);
     f_mount(&fsi.GetSDFileSystem(), "/", 1);
-
+//test
     sampler.Init(fsi.GetSDPath());
     sampler.SetLooping(true);
 
