@@ -1,13 +1,67 @@
+#include <stdio.h>
+#include <string.h>
 #include "daisy_seed.h"
 #include "daisysp.h"
 
-// Use the daisy namespace to prevent having to type
-// daisy:: before all libdaisy functions
 using namespace daisy;
 using namespace daisysp;
 
-// Declare a DaisySeed object called hardware
-DaisySeed hardware;
+DaisySeed      hardware;
+SdmmcHandler   sdcard;
+FatFSInterface fsi;
+WavPlayer      sampler1;
+WavPlayer      sampler2;
+WavPlayer      sampler3;
+WavPlayer      sampler4;
+WavPlayer      sampler5;
+WavPlayer      sampler6;
+WavPlayer      sampler7;
+WavPlayer      sampler8;
+WavPlayer      sampler9;
+
+Oscillator osc;
+
+Switch button1;
+Led    led1;
+
+void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
+                   AudioHandle::InterleavingOutputBuffer out,
+                   size_t                                size)
+{
+    float osc_out;
+
+    //Nobody likes a bouncy button
+    button1.Debounce();
+
+    // Set in and loop gain from CV_1 and CV_2 respectively
+    float in_level   = 1.f; //patch.GetAdcValue(CV_1);
+    float loop_level = hardware.adc.GetFloat(0);
+
+    //if you press the button1, toggle the record state
+    if(button1.RisingEdge()) {}
+
+    // if you hold the button1 longer than 1000 ms (1 sec), clear the loop
+    if(button1.TimeHeldMs() >= 1000.f) {}
+
+    //Convert floating point knob to midi (0-127)
+    //Then convert midi to freq. in Hz
+    //osc.SetFreq(mtof(hardware.adc.GetFloat(0) * 127));
+
+    for(size_t i = 0; i < size; i += 2)
+    {
+        osc.SetAmp(loop_level);
+        //get the next oscillator sample
+        osc_out = osc.Process();
+
+        float sampler1Output = s162f(sampler1.Stream()) * 0.5f;
+
+        // For now it is mono.
+        out[i] = out[i + 1] = sampler1Output + osc_out;
+    }
+
+    led1.Set(3.f);
+    led1.Update();
+}
 
 int main(void)
 {
@@ -16,33 +70,43 @@ int main(void)
     // components before initialization.
     hardware.Configure();
     hardware.Init();
+    hardware.SetAudioBlockSize(4);
 
-    Led led1;
+    // CONFIGURE SD CARD
+    SdmmcHandler::Config sd_cfg;
+    sd_cfg.Defaults();
+    sdcard.Init(sd_cfg);
+    fsi.Init(FatFSInterface::Config::MEDIA_SD);
+    f_mount(&fsi.GetSDFileSystem(), "/", 1);
 
-    //Initialize led1. We'll plug it into pin 28.
-    //false here indicates the value is uninverted
-    led1.Init(hardware.GetPin(28), false);
+    // CONFIGURE SAMPLER
+    sampler1.Init(fsi.GetSDPath());
+    sampler1.SetLooping(true);
 
-    //This is our ADC configuration
+    float samplerate = hardware.AudioSampleRate(); // per second
+
+    // INITIALIZE CONTROLS AND LEDS
     AdcChannelConfig adcConfig;
-    //Configure pin 21 as an ADC input. This is where we'll read the knob.
-    adcConfig.InitSingle(hardware.GetPin(21));
+    adcConfig.InitSingle(hardware.GetPin(21));                // potentiometer
+    led1.Init(hardware.GetPin(20), false, samplerate / 48.f); // red LED
+    button1.Init(hardware.GetPin(28), samplerate / 48.f);     // record button
 
-    //Initialize the adc with the config we just made
     hardware.adc.Init(&adcConfig, 1);
-    //Start reading values
     hardware.adc.Start();
+
+    // CONFIGURE OSCILLATOR
+    osc.Init(samplerate);
+    osc.SetWaveform(osc.WAVE_SIN);
+    osc.SetAmp(0);
+    osc.SetFreq(400);
+
+    // Start the audio callback
+    hardware.StartAudio(AudioCallback);
 
     // Loop forever
     for(;;)
     {
-        // Set the onboard LED to the value we read from the knob
-        led1.Set(hardware.adc.GetFloat(0));
-
-        //Update the led to reflect the set value
-        led1.Update();
-
-        //wait 1 ms
-        System::Delay(1);
+        // Prepare buffers for sampler as needed
+        sampler1.Prepare();
     }
 }
