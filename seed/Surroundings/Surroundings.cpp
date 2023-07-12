@@ -19,6 +19,7 @@ WavPlayer      sampler7;
 WavPlayer      sampler8;
 WavPlayer      sampler9;
 
+// For testing purposes only
 Oscillator osc;
 
 Switch button1;
@@ -34,8 +35,8 @@ void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
     button1.Debounce();
 
     // Set in and loop gain from CV_1 and CV_2 respectively
-    float in_level   = 1.f; //patch.GetAdcValue(CV_1);
-    float loop_level = hardware.adc.GetFloat(0);
+    float in_level         = 1.f; //patch.GetAdcValue(CV_1);
+    float volumeKnob1Level = hardware.adc.GetFloat(0);
 
     //if you press the button1, toggle the record state
     if(button1.RisingEdge()) {}
@@ -43,20 +44,27 @@ void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
     // if you hold the button1 longer than 1000 ms (1 sec), clear the loop
     if(button1.TimeHeldMs() >= 1000.f) {}
 
-    //Convert floating point knob to midi (0-127)
-    //Then convert midi to freq. in Hz
-    //osc.SetFreq(mtof(hardware.adc.GetFloat(0) * 127));
-
     for(size_t i = 0; i < size; i += 2)
     {
-        osc.SetAmp(loop_level);
+        osc.SetAmp(volumeKnob1Level);
         //get the next oscillator sample
         osc_out = osc.Process();
 
-        float sampler1Output = s162f(sampler1.Stream()) * 0.5f;
+        float sampler1Output = s162f(sampler1.Stream()) * volumeKnob1Level;
+        float sampler2Output = s162f(sampler2.Stream()) * 0.5f;
+        float sampler3Output = s162f(sampler3.Stream()) * 0.5f;
+        float sampler4Output = s162f(sampler4.Stream()) * 0.5f;
+        float sampler5Output = s162f(sampler5.Stream()) * 0.5f;
+        float sampler6Output = s162f(sampler6.Stream()) * 0.5f;
+        float sampler7Output = s162f(sampler7.Stream()) * 0.5f;
+        float sampler8Output = s162f(sampler8.Stream()) * 0.5f;
+        float sampler9Output = s162f(sampler9.Stream()) * 0.5f;
 
         // For now it is mono.
-        out[i] = out[i + 1] = sampler1Output + osc_out;
+        out[i] = out[i + 1] = sampler1Output + sampler2Output + sampler3Output
+                              + sampler4Output + sampler5Output + sampler6Output
+                              + sampler7Output + sampler8Output + sampler9Output
+                              + osc_out;
     }
 
     led1.Set(3.f);
@@ -81,7 +89,44 @@ int main(void)
 
     // CONFIGURE SAMPLER
     sampler1.Init(fsi.GetSDPath());
+    sampler2.Init(fsi.GetSDPath());
+    sampler3.Init(fsi.GetSDPath());
+    sampler4.Init(fsi.GetSDPath());
+    sampler5.Init(fsi.GetSDPath());
+    sampler6.Init(fsi.GetSDPath());
+    sampler7.Init(fsi.GetSDPath());
+    sampler8.Init(fsi.GetSDPath());
+    sampler9.Init(fsi.GetSDPath());
+
     sampler1.SetLooping(true);
+    sampler2.SetLooping(true);
+    sampler3.SetLooping(true);
+    sampler4.SetLooping(true);
+    sampler5.SetLooping(true);
+    sampler6.SetLooping(true);
+    sampler7.SetLooping(true);
+    sampler8.SetLooping(true);
+    sampler9.SetLooping(true);
+
+    /* sampler1.Open(0);
+    sampler2.Open(1);
+    sampler3.Open(2);
+    sampler4.Open(3);
+    sampler5.Open(4);
+    sampler6.Open(5);
+    sampler7.Open(6);
+    sampler8.Open(7);
+    sampler9.Open(8); */
+
+    // Close all but the first for now
+    sampler2.Close();
+    sampler3.Close();
+    sampler4.Close();
+    sampler5.Close();
+    sampler6.Close();
+    sampler7.Close();
+    sampler8.Close();
+    sampler9.Close();
 
     float samplerate = hardware.AudioSampleRate(); // per second
 
@@ -106,7 +151,19 @@ int main(void)
     // Loop forever
     for(;;)
     {
-        // Prepare buffers for sampler as needed
         sampler1.Prepare();
+        sampler2.Prepare();
+        sampler3.Prepare();
+        sampler4.Prepare();
+        sampler5.Prepare();
+        sampler6.Prepare();
+        sampler7.Prepare();
+        sampler8.Prepare();
+        sampler9.Prepare();
     }
 }
+
+
+//Convert floating point knob to midi (0-127)
+//Then convert midi to freq. in Hz
+//osc.SetFreq(mtof(hardware.adc.GetFloat(0) * 127));
