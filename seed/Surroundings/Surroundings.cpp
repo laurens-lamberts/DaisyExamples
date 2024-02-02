@@ -3,6 +3,8 @@
 #include "daisy_seed.h"
 #include "daisysp.h"
 
+// Wav files need to be 16 bit - 1 channel - 48kHz
+
 using namespace daisy;
 using namespace daisysp;
 
@@ -50,24 +52,26 @@ void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
         //get the next oscillator sample
         osc_out = osc.Process();
 
-        float sampler1Output = s162f(sampler1.Stream()) * volumeKnob1Level;
-        float sampler2Output = s162f(sampler2.Stream()) * 0.5f;
+        float sampler1Output = s162f(sampler1.Stream());
+        /* float sampler2Output = s162f(sampler2.Stream()) * 0.5f;
         float sampler3Output = s162f(sampler3.Stream()) * 0.5f;
         float sampler4Output = s162f(sampler4.Stream()) * 0.5f;
         float sampler5Output = s162f(sampler5.Stream()) * 0.5f;
         float sampler6Output = s162f(sampler6.Stream()) * 0.5f;
         float sampler7Output = s162f(sampler7.Stream()) * 0.5f;
         float sampler8Output = s162f(sampler8.Stream()) * 0.5f;
-        float sampler9Output = s162f(sampler9.Stream()) * 0.5f;
+        float sampler9Output = s162f(sampler9.Stream()) * 0.5f; */
 
         // For now it is mono.
-        out[i] = out[i + 1] = sampler1Output + sampler2Output + sampler3Output
+        out[i] = out[i + 1] = sampler1Output;
+        // + osc_out;
+        /*  + sampler2Output + sampler3Output
                               + sampler4Output + sampler5Output + sampler6Output
-                              + sampler7Output + sampler8Output + sampler9Output
-                              + osc_out;
+                              + sampler7Output + sampler8Output
+                              + sampler9Output + osc_out */
     }
 
-    led1.Set(3.f);
+    led1.Set(3.f * volumeKnob1Level);
     led1.Update();
 }
 
@@ -80,16 +84,20 @@ int main(void)
     hardware.Init();
     hardware.SetAudioBlockSize(4);
 
+    hardware.PrintLine("INITIALIZING...");
+    printf("TEST123");
+
     // CONFIGURE SD CARD
     SdmmcHandler::Config sd_cfg;
     sd_cfg.Defaults();
+    //sd_cfg.speed = daisy::SdmmcHandler::Speed::SLOW;
     sdcard.Init(sd_cfg);
     fsi.Init(FatFSInterface::Config::MEDIA_SD);
     f_mount(&fsi.GetSDFileSystem(), "/", 1);
 
     // CONFIGURE SAMPLER
     sampler1.Init(fsi.GetSDPath());
-    sampler2.Init(fsi.GetSDPath());
+    /* sampler2.Init(fsi.GetSDPath());
     sampler3.Init(fsi.GetSDPath());
     sampler4.Init(fsi.GetSDPath());
     sampler5.Init(fsi.GetSDPath());
@@ -106,7 +114,7 @@ int main(void)
     sampler6.SetLooping(true);
     sampler7.SetLooping(true);
     sampler8.SetLooping(true);
-    sampler9.SetLooping(true);
+    sampler9.SetLooping(true); */
 
     /* sampler1.Open(0);
     sampler2.Open(1);
@@ -119,14 +127,14 @@ int main(void)
     sampler9.Open(8); */
 
     // Close all but the first for now
-    sampler2.Close();
+    /* sampler2.Close();
     sampler3.Close();
     sampler4.Close();
     sampler5.Close();
     sampler6.Close();
     sampler7.Close();
     sampler8.Close();
-    sampler9.Close();
+    sampler9.Close(); */
 
     float samplerate = hardware.AudioSampleRate(); // per second
 
@@ -152,14 +160,14 @@ int main(void)
     for(;;)
     {
         sampler1.Prepare();
-        sampler2.Prepare();
+        /* sampler2.Prepare();
         sampler3.Prepare();
         sampler4.Prepare();
         sampler5.Prepare();
         sampler6.Prepare();
         sampler7.Prepare();
         sampler8.Prepare();
-        sampler9.Prepare();
+        sampler9.Prepare(); */
     }
 }
 
