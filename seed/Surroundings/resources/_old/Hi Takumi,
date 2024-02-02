@@ -1,0 +1,16 @@
+Hi Takumi,
+
+Thanks for the advice on the connection!
+Unfortunately, no blinking light on the SDMMC yet.
+
+A few follow-up questions;
+
+1. You mentioned to connect DO to D0, which is marked 'USB ID' on the daisy pinout. Shouldn't this be D4, which would be DATA0?
+2. Is there a diagram on how to connect the ST-LINK V2 to the daisy seed headers? I happen to have that debugger already. If the V3 is necessary, please let me know.
+3. I formatted a 128GB SanDisk Extreme SD card to FAT with MBR, and put a 48kHz 16bit mono WAV file on it. Would this be fine for testing the WavPlayer? I can't seem to find any precise specs on what SD card to use.
+4. As you can see I attempted to wire the SD card socket as direct as possible using the breadboard, as I read about the sensitivity of the interface. Would this be a viable test setup, or would I need to create a PCB in order to start testing?
+5. Would I need to configure the SD card reader setting to SLOW when breadboarding, as suggested in the earlier thread you mentioned?
+
+That's a lot of questions, but I can't seem to find a complete guide on how to properly connect an SD card to the daisy. Is there a resource I'm missing? Otherwise, I could share an overview of all I had to do to get it working with specs and diagrams, that might be nice to include in the wiki (if you're up for that).
+
+Thanks for the amazing support. Really nice to be able to put up questions here on the Discord channel.
