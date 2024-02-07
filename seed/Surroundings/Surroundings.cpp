@@ -43,55 +43,52 @@ void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
     // For now it is mono to both outputs
     for(size_t i = 0; i < size; i += 2)
     {
-        out[i] = out[i + 1] = 0.0f;
+        // out[i] = out[i + 1] = 0.0f;
         if(SAMPLE_1_ENABLED)
         {
+            // Storm
             float sampler1Output = s162f(sampler1.Stream());
             sampler1Output *= volumeKnob1Level; // Apply volume level
+            sampler1Output *= 1.8f;             // Normalisation
             out[i] = out[i + 1] = sampler1Output;
         }
         if(SAMPLE_2_ENABLED)
         {
+            // Waves
             float sampler2Output = s162f(sampler2.Stream());
             sampler2Output *= volumeKnob2Level; // Apply volume level
-            out[i] += sampler2Output;
-            out[i + 1] += sampler2Output;
+            sampler2Output *= 0.6f;             // Normalisation
+            out[i] += out[i + 1] += sampler2Output;
         }
         if(SAMPLE_3_ENABLED)
         {
             float sampler3Output = s162f(sampler3.Stream());
-            out[i] += sampler3Output;
-            out[i + 1] += sampler3Output;
+            out[i] += out[i + 1] += sampler3Output;
         }
         if(SAMPLE_4_ENABLED)
         {
-            float sampler4Output = s162f(sampler4.Stream()) * 0.5f;
-            out[i] += sampler4Output;
-            out[i + 1] += sampler4Output;
+            float sampler4Output = s162f(sampler4.Stream());
+            out[i] += out[i + 1] += sampler4Output;
         }
         if(SAMPLE_5_ENABLED)
         {
             float sampler5Output = s162f(sampler5.Stream());
-            out[i] += sampler5Output;
-            out[i + 1] += sampler5Output;
+            out[i] += out[i + 1] += sampler5Output;
         }
         if(SAMPLE_6_ENABLED)
         {
-            float sampler6Output = s162f(sampler6.Stream()) * 0.5f;
-            out[i] += sampler6Output;
-            out[i + 1] += sampler6Output;
+            float sampler6Output = s162f(sampler6.Stream());
+            out[i] += out[i + 1] += sampler6Output;
         }
         if(SAMPLE_7_ENABLED)
         {
             float sampler7Output = s162f(sampler7.Stream());
-            out[i] += sampler7Output;
-            out[i + 1] += sampler7Output;
+            out[i] += out[i + 1] += sampler7Output;
         }
         if(SAMPLE_8_ENABLED)
         {
-            float sampler8Output = s162f(sampler8.Stream()) * 0.5f;
-            out[i] += sampler8Output;
-            out[i + 1] += sampler8Output;
+            float sampler8Output = s162f(sampler8.Stream());
+            out[i] += out[i + 1] += sampler8Output;
         }
     }
 
