@@ -52,13 +52,20 @@ int main(void)
     // Init SD Card
     SdmmcHandler::Config sd_cfg;
     sd_cfg.Defaults();
+    // sd_cfg.speed = daisy::SdmmcHandler::Speed::SLOW;
+    sd_cfg.width = daisy::SdmmcHandler::BusWidth::BITS_1;
     sd.Init(sd_cfg);
 
     // Links libdaisy i/o to fatfs driver.
     fsi.Init(FatFSInterface::Config::MEDIA_SD);
 
     // Mount SD Card
-    f_mount(&fsi.GetSDFileSystem(), "/", 1);
+    FRESULT res = f_mount(&fsi.GetSDFileSystem(), "/", 1);
+    if(res != FR_OK)
+    {
+        printf("TEST FAILED: f_mount returned");
+        // Handle error...
+    }
 
     // Open and write the test file to the SD Card.
     if(f_open(&SDFile, TEST_FILE_NAME, (FA_CREATE_ALWAYS) | (FA_WRITE))

@@ -13,8 +13,8 @@ Requirements;
 2. Alter the SDMMC example by adding this line before the line that specifies "sd.Init(sd_cfg);";
    `sd_cfg.speed = daisy::SdmmcHandler::Speed::SLOW;`
    This will make the SD card run at a slower speed, which required when using breadboard wires. This can later be removed when you start using a PCB with proper traces.
-3. Run SDMMC example in debug mode (using F5 in vscode with cortex debug & STLINK-v3-MINIE)
-4. Set a breakpoint at the line that is as follows; "if(f_open(&SDFile, TEST_FILE_NAME, (FA_CREATE_ALWAYS) | (FA_WRITE)) == FR_OK)"
+3. Set a breakpoint at the line that is as follows; "if(f_open(&SDFile, TEST_FILE_NAME, (FA_CREATE_ALWAYS) | (FA_WRITE)) == FR_OK)"
+4. Run SDMMC example in debug mode (using F5 in vscode with cortex debug & STLINK-v3-MINIE)
 5. When the executer is at this line, "step into" and "step over" until you reach "if (res == FR_OK)"
 6. Check the status by hovering over "res";
    a. FR_DISK_ERR: SD card was not found (check your wiring on the breadboard and ensure the SD card is properly inserted)

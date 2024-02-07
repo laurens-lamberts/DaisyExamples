@@ -1,0 +1,21 @@
+2 (D1 - SD Data3) --> IRQ / DAT1 --> YES
+3 (D2 - SD Data2) --> DAT2 --> YES
+4 (D3 - SD Data1) --> CS --> YES
+5 (D4 - SD Data0) --> DO --> YES
+6 (D5 - SD CMD) --> DI --> YES
+7 (D6 - SD CLK) --> SCLK --> NO
+20 (AGND) --> (VSS) GND and GND (VSS) (both sides)
+21 (3v3 Analog) --> VDD and VDD (both sides)
+
++-------------------+--------------------------------------+------------------+
+| Daisy seed PIN    | SD breakout port                     | with pull-up res |
++-------------------+--------------------------------------+------------------+
+| 2 (D1 - SD Data3) | IRQ / DAT1                           | YES              |
+| 3 (D2 - SD Data2) | DAT2                                 | YES              |
+| 4 (D3 - SD Data1) | CS                                   | YES              |
+| 5 (D4 - SD Data0) | DO                                   | YES              |
+| 6 (D5 - SD CMD)   | DI                                   | YES              |
+| 7 (D6 - SD CLK)   | SCLK                                 | NO               |
+| 20 (AGND)         | (VSS) GND and GND (VSS) (both sides) | NO               |
+| 21 (3v3 Analog)   | VDD and VDD (both sides)             | NO               |
++-------------------+--------------------------------------+------------------+
