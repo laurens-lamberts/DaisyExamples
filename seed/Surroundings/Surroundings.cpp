@@ -91,6 +91,7 @@ int main(void)
     SdmmcHandler::Config sd_cfg;
     sd_cfg.Defaults();
     //sd_cfg.speed = daisy::SdmmcHandler::Speed::SLOW;
+    sd_cfg.width = daisy::SdmmcHandler::BusWidth::BITS_1;
     sdcard.Init(sd_cfg);
     fsi.Init(FatFSInterface::Config::MEDIA_SD);
     f_mount(&fsi.GetSDFileSystem(), "/", 1);
