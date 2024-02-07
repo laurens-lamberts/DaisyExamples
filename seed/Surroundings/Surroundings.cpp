@@ -20,51 +20,92 @@ WavPlayer      sampler6;
 WavPlayer      sampler7;
 WavPlayer      sampler8;
 
-Switch button1;
-Led    led1;
+// Switch button1;
+Led led1;
+
+#define SAMPLE_1_ENABLED true
+#define SAMPLE_2_ENABLED true
+#define SAMPLE_3_ENABLED false
+#define SAMPLE_4_ENABLED false
+#define SAMPLE_5_ENABLED false
+#define SAMPLE_6_ENABLED false
+#define SAMPLE_7_ENABLED false
+#define SAMPLE_8_ENABLED false
 
 void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
                    AudioHandle::InterleavingOutputBuffer out,
                    size_t                                size)
 {
     //Nobody likes a bouncy button
-    button1.Debounce();
+    // button1.Debounce();
 
     // Set in and loop gain from CV_1 and CV_2 respectively
     // float in_level         = 1.f; //patch.GetAdcValue(CV_1);
     float volumeKnob1Level = hardware.adc.GetFloat(0);
+    float volumeKnob2Level = hardware.adc.GetFloat(1);
 
     //if you press the button1, toggle the record state
-    if(button1.RisingEdge()) {}
+    // if(button1.RisingEdge()) {}
 
     // if you hold the button1 longer than 1000 ms (1 sec), clear the loop
-    if(button1.TimeHeldMs() >= 1000.f) {}
+    // if(button1.TimeHeldMs() >= 1000.f) {}
 
+    // For now it is mono to both outputs
     for(size_t i = 0; i < size; i += 2)
     {
-        // For now it is mono to both outputs
-        float addedLoops = 0.0f;
-
-        float sampler1Output = s162f(sampler1.Stream());
-        /* float sampler2Output = s162f(sampler2.Stream()) * 0.5f;
-        float sampler3Output = s162f(sampler3.Stream()) * 0.5f;
-        float sampler4Output = s162f(sampler4.Stream()) * 0.5f;
-        float sampler5Output = s162f(sampler5.Stream()) * 0.5f;
-        float sampler6Output = s162f(sampler6.Stream()) * 0.5f;
-        float sampler7Output = s162f(sampler7.Stream()) * 0.5f;
-        float sampler8Output = s162f(sampler8.Stream()) * 0.5f;
-        float sampler9Output = s162f(sampler9.Stream()) * 0.5f; */
-
-        // For now it is mono.
-        out[i] = out[i + 1] = sampler1Output;
-        // + osc_out;
-        /*  + sampler2Output + sampler3Output
-                              + sampler4Output + sampler5Output + sampler6Output
-                              + sampler7Output + sampler8Output
-                              + sampler9Output + osc_out */
+        out[i] = out[i + 1] = 0.0f;
+        if(SAMPLE_1_ENABLED)
+        {
+            float sampler1Output = s162f(sampler1.Stream());
+            sampler1Output *= volumeKnob1Level; // Apply volume level
+            out[i] = out[i + 1] = sampler1Output;
+        }
+        if(SAMPLE_2_ENABLED)
+        {
+            float sampler2Output = s162f(sampler2.Stream());
+            sampler2Output *= volumeKnob2Level; // Apply volume level
+            out[i] += sampler2Output;
+            out[i + 1] += sampler2Output;
+        }
+        if(SAMPLE_3_ENABLED)
+        {
+            float sampler3Output = s162f(sampler3.Stream());
+            out[i] += sampler3Output;
+            out[i + 1] += sampler3Output;
+        }
+        if(SAMPLE_4_ENABLED)
+        {
+            float sampler4Output = s162f(sampler4.Stream()) * 0.5f;
+            out[i] += sampler4Output;
+            out[i + 1] += sampler4Output;
+        }
+        if(SAMPLE_5_ENABLED)
+        {
+            float sampler5Output = s162f(sampler5.Stream());
+            out[i] += sampler5Output;
+            out[i + 1] += sampler5Output;
+        }
+        if(SAMPLE_6_ENABLED)
+        {
+            float sampler6Output = s162f(sampler6.Stream()) * 0.5f;
+            out[i] += sampler6Output;
+            out[i + 1] += sampler6Output;
+        }
+        if(SAMPLE_7_ENABLED)
+        {
+            float sampler7Output = s162f(sampler7.Stream());
+            out[i] += sampler7Output;
+            out[i + 1] += sampler7Output;
+        }
+        if(SAMPLE_8_ENABLED)
+        {
+            float sampler8Output = s162f(sampler8.Stream()) * 0.5f;
+            out[i] += sampler8Output;
+            out[i + 1] += sampler8Output;
+        }
     }
 
-    led1.Set(3.f * volumeKnob1Level);
+    led1.Set(1.f * volumeKnob1Level);
     led1.Update();
 }
 
@@ -73,52 +114,91 @@ int main(void)
     // Configure and Initialize the Daisy Seed
     // These are separate to allow reconfiguration of any of the internal
     // components before initialization.
-    hardware.Configure();
+    // hardware.Configure();
     hardware.Init();
     hardware.SetAudioBlockSize(4);
 
     // hardware.PrintLine("INITIALIZING...");
     // printf("TEST123");
+    // fflush(stdout);
 
     // CONFIGURE SD CARD
     SdmmcHandler::Config sd_cfg;
     sd_cfg.Defaults();
-    //sd_cfg.speed = daisy::SdmmcHandler::Speed::SLOW;
+    // sd_cfg.speed = daisy::SdmmcHandler::Speed::FAST;
     sd_cfg.width = daisy::SdmmcHandler::BusWidth::BITS_1;
     sdcard.Init(sd_cfg);
     fsi.Init(FatFSInterface::Config::MEDIA_SD);
     f_mount(&fsi.GetSDFileSystem(), "/", 1);
 
+    std::string sdPath = fsi.GetSDPath();
+
+    // 0 storm-mono-16bit.wav
+    // 1 storm-stereo-16bit.wav
+    // 2 waves-mono-16bit.wav
+    // 3 waves-stereo-16bit.wav
+
     // CONFIGURE SAMPLER
-    sampler1.Init(fsi.GetSDPath());
-    /* sampler2.Init(fsi.GetSDPath());
 
-    sampler1.SetLooping(true);
-    sampler2.SetLooping(true);
-    sampler3.SetLooping(true);
-    sampler4.SetLooping(true);
-    sampler5.SetLooping(true);
-    sampler6.SetLooping(true);
-    sampler7.SetLooping(true);
-    sampler8.SetLooping(true);
-    sampler9.SetLooping(true); */
-
-    /* sampler1.Open(0);
-    sampler9.Open(8); */
-
-    // Close all but the first for now
-    /* sampler2.Close();
-    sampler9.Close(); */
+    if(SAMPLE_1_ENABLED)
+    {
+        sampler1.Init(sdPath.c_str());
+        sampler1.SetLooping(true);
+        sampler1.Open(1);
+    }
+    if(SAMPLE_2_ENABLED)
+    {
+        sampler2.Init(sdPath.c_str());
+        sampler2.SetLooping(true);
+        sampler2.Open(3);
+    }
+    if(SAMPLE_3_ENABLED)
+    {
+        sampler3.Init(sdPath.c_str());
+        sampler3.SetLooping(true);
+        sampler3.Open(1);
+    }
+    if(SAMPLE_4_ENABLED)
+    {
+        sampler4.Init(sdPath.c_str());
+        sampler4.SetLooping(true);
+        sampler4.Open(3);
+    }
+    if(SAMPLE_5_ENABLED)
+    {
+        sampler5.Init(sdPath.c_str());
+        sampler5.SetLooping(true);
+        sampler5.Open(1);
+    }
+    if(SAMPLE_6_ENABLED)
+    {
+        sampler6.Init(sdPath.c_str());
+        sampler6.SetLooping(true);
+        sampler6.Open(3);
+    }
+    if(SAMPLE_7_ENABLED)
+    {
+        sampler7.Init(sdPath.c_str());
+        sampler7.SetLooping(true);
+        sampler7.Open(1);
+    }
+    if(SAMPLE_8_ENABLED)
+    {
+        sampler8.Init(sdPath.c_str());
+        sampler8.SetLooping(true);
+        sampler8.Open(3);
+    }
 
     float samplerate = hardware.AudioSampleRate(); // per second
 
     // INITIALIZE CONTROLS AND LEDS
     AdcChannelConfig adcConfig;
-    adcConfig.InitSingle(hardware.GetPin(21));                // potentiometer
+    adcConfig.InitSingle(hardware.GetPin(19));                // potentiometer 0
+    adcConfig.InitSingle(hardware.GetPin(21));                // potentiometer 1
     led1.Init(hardware.GetPin(20), false, samplerate / 48.f); // red LED
     // button1.Init(hardware.GetPin(28), samplerate / 48.f);     // record button
 
-    hardware.adc.Init(&adcConfig, 1);
+    hardware.adc.Init(&adcConfig, 1); // number will have to be 8
     hardware.adc.Start();
 
     // Start the audio callback
@@ -127,14 +207,37 @@ int main(void)
     // Loop forever
     for(;;)
     {
-        sampler1.Prepare();
-        /* sampler2.Prepare();
-        sampler3.Prepare();
-        sampler4.Prepare();
-        sampler5.Prepare();
-        sampler6.Prepare();
-        sampler7.Prepare();
-        sampler8.Prepare();
-        sampler9.Prepare(); */
+        if(SAMPLE_1_ENABLED)
+        {
+            sampler1.Prepare();
+        }
+        if(SAMPLE_2_ENABLED)
+        {
+            sampler2.Prepare();
+        }
+        if(SAMPLE_3_ENABLED)
+        {
+            sampler3.Prepare();
+        }
+        if(SAMPLE_4_ENABLED)
+        {
+            sampler4.Prepare();
+        }
+        if(SAMPLE_5_ENABLED)
+        {
+            sampler5.Prepare();
+        }
+        if(SAMPLE_6_ENABLED)
+        {
+            sampler6.Prepare();
+        }
+        if(SAMPLE_7_ENABLED)
+        {
+            sampler7.Prepare();
+        }
+        if(SAMPLE_8_ENABLED)
+        {
+            sampler8.Prepare();
+        }
     }
 }
