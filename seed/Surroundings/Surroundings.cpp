@@ -20,7 +20,6 @@ WavPlayer      sampler6;
 WavPlayer      sampler7;
 WavPlayer      sampler8;
 
-// Switch button1;
 Led led1;
 
 #define SAMPLE_1_ENABLED true
@@ -36,19 +35,10 @@ void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
                    AudioHandle::InterleavingOutputBuffer out,
                    size_t                                size)
 {
-    //Nobody likes a bouncy button
-    // button1.Debounce();
-
     // Set in and loop gain from CV_1 and CV_2 respectively
     // float in_level         = 1.f; //patch.GetAdcValue(CV_1);
     float volumeKnob1Level = hardware.adc.GetFloat(0);
     float volumeKnob2Level = hardware.adc.GetFloat(1);
-
-    //if you press the button1, toggle the record state
-    // if(button1.RisingEdge()) {}
-
-    // if you hold the button1 longer than 1000 ms (1 sec), clear the loop
-    // if(button1.TimeHeldMs() >= 1000.f) {}
 
     // For now it is mono to both outputs
     for(size_t i = 0; i < size; i += 2)
@@ -192,13 +182,13 @@ int main(void)
     float samplerate = hardware.AudioSampleRate(); // per second
 
     // INITIALIZE CONTROLS AND LEDS
-    AdcChannelConfig adcConfig;
-    adcConfig.InitSingle(hardware.GetPin(19));                // potentiometer 0
-    adcConfig.InitSingle(hardware.GetPin(21));                // potentiometer 1
+    AdcChannelConfig adcConfig[2]; // Create an array of AdcChannelConfig
     led1.Init(hardware.GetPin(20), false, samplerate / 48.f); // red LED
-    // button1.Init(hardware.GetPin(28), samplerate / 48.f);     // record button
 
-    hardware.adc.Init(&adcConfig, 1); // number will have to be 8
+    adcConfig[0].InitSingle(hardware.GetPin(21)); // potentiometer
+    adcConfig[1].InitSingle(hardware.GetPin(19)); // potentiometer
+
+    hardware.adc.Init(adcConfig, 2); // Has to be 8 channels later
     hardware.adc.Start();
 
     // Start the audio callback
