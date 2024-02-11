@@ -31,14 +31,16 @@ Led led1;
 #define SAMPLE_7_ENABLED false
 #define SAMPLE_8_ENABLED false
 
+constexpr int NUMBER_OF_ADC_CHANNELS = 3;
+
 void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
                    AudioHandle::InterleavingOutputBuffer out,
                    size_t                                size)
 {
-    // Set in and loop gain from CV_1 and CV_2 respectively
-    // float in_level         = 1.f; //patch.GetAdcValue(CV_1);
-    float volumeKnob1Level = hardware.adc.GetFloat(0);
-    float volumeKnob2Level = hardware.adc.GetFloat(1);
+    float mixKnobLevel = hardware.adc.GetFloat(0);
+
+    float volumeKnob1Level = hardware.adc.GetFloat(1);
+    float volumeKnob2Level = hardware.adc.GetFloat(2);
 
     // For now it is mono to both outputs
     for(size_t i = 0; i < size; i += 2)
@@ -90,6 +92,8 @@ void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
             float sampler8Output = s162f(sampler8.Stream());
             out[i] += out[i + 1] += sampler8Output;
         }
+        out[i] *= mixKnobLevel;
+        out[i + 1] *= mixKnobLevel;
     }
 
     led1.Set(1.f * volumeKnob1Level);
@@ -120,24 +124,31 @@ int main(void)
 
     std::string sdPath = fsi.GetSDPath();
 
-    // 0 storm-mono-16bit.wav
-    // 1 storm-stereo-16bit.wav
-    // 2 waves-mono-16bit.wav
-    // 3 waves-stereo-16bit.wav
-
     // CONFIGURE SAMPLER
+    // 1: birds-dutch
+    // 2: cat purring
+    // 3: crickets
+    // 4: crickets?
+    // 5: stream A
+    // 6: oystercatcher
+    // 7: stream B
+    // 8: stream C ?
+    // 9: stream
+    // 10: stream
+    // 11: stream
+    // 12: stream
 
     if(SAMPLE_1_ENABLED)
     {
         sampler1.Init(sdPath.c_str());
         sampler1.SetLooping(true);
-        sampler1.Open(1);
+        sampler1.Open(1); //closest knob
     }
     if(SAMPLE_2_ENABLED)
     {
         sampler2.Init(sdPath.c_str());
         sampler2.SetLooping(true);
-        sampler2.Open(3);
+        sampler2.Open(3); //farthest knob
     }
     if(SAMPLE_3_ENABLED)
     {
@@ -179,13 +190,16 @@ int main(void)
     float samplerate = hardware.AudioSampleRate(); // per second
 
     // INITIALIZE CONTROLS AND LEDS
-    AdcChannelConfig adcConfig[2]; // Create an array of AdcChannelConfig
+    AdcChannelConfig adcConfig
+        [NUMBER_OF_ADC_CHANNELS]; // Create an array of AdcChannelConfig
     led1.Init(hardware.GetPin(20), false, samplerate / 48.f); // red LED
 
-    adcConfig[0].InitSingle(hardware.GetPin(21)); // potentiometer
-    adcConfig[1].InitSingle(hardware.GetPin(19)); // potentiometer
+    adcConfig[1].InitSingle(hardware.GetPin(21)); // sample1 potentiometer
+    adcConfig[2].InitSingle(hardware.GetPin(19)); // sample2 potentiometer
+    adcConfig[0].InitSingle(hardware.GetPin(18)); // mix potentiometer
 
-    hardware.adc.Init(adcConfig, 2); // Has to be 8 channels later
+    hardware.adc.Init(adcConfig,
+                      NUMBER_OF_ADC_CHANNELS); // Has to be >8 channels later
     hardware.adc.Start();
 
     // Start the audio callback
