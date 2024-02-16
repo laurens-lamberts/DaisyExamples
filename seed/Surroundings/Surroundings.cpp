@@ -2,7 +2,7 @@
 #include <string.h>
 #include "daisy_seed.h"
 #include "daisysp.h"
-#include "modules/wavplayer/wavplayer.h"
+// #include "modules/wavplayer/wavplayer.h"
 
 // Wav files need to be 16 bit - 1 channel (though 2 channels seems fine?) - 48kHz
 
@@ -14,25 +14,33 @@ SdmmcHandler   sdcard;
 FatFSInterface fsi;
 WavPlayer      sampler1Left;
 WavPlayer      sampler1Right;
-WavPlayer      sampler1;
-WavPlayer      sampler2;
-WavPlayer      sampler3;
-WavPlayer      sampler4;
-WavPlayer      sampler5;
-WavPlayer      sampler6;
-WavPlayer      sampler7;
-WavPlayer      sampler8;
+WavPlayer      sampler2Left;
+WavPlayer      sampler2Right;
+WavPlayer      sampler3Left;
+WavPlayer      sampler3Right;
+WavPlayer      sampler4Left;
+WavPlayer      sampler4Right;
+WavPlayer      sampler5Left;
+WavPlayer      sampler5Right;
+WavPlayer      sampler6Left;
+WavPlayer      sampler6Right;
+WavPlayer      sampler7Left;
+WavPlayer      sampler7Right;
+WavPlayer      sampler8Left;
+WavPlayer      sampler8Right;
 
 Led led1;
 
 // define buffers
 // these are initialized globally on the SDRAM memory sector
 #define BUFSIZE 4096
-int16_t DSY_SDRAM_BSS bufferLeft[BUFSIZE];
-int16_t DSY_SDRAM_BSS bufferRight[BUFSIZE];
+int16_t DSY_SDRAM_BSS sample1BufferLeft[BUFSIZE];
+int16_t DSY_SDRAM_BSS sample1BufferRight[BUFSIZE];
+int16_t DSY_SDRAM_BSS sample2BufferLeft[BUFSIZE];
+int16_t DSY_SDRAM_BSS sample2BufferRight[BUFSIZE];
 
-#define SAMPLE_1_ENABLED false
-#define SAMPLE_2_ENABLED false
+#define SAMPLE_1_ENABLED true
+#define SAMPLE_2_ENABLED true
 #define SAMPLE_3_ENABLED false
 #define SAMPLE_4_ENABLED false
 #define SAMPLE_5_ENABLED false
@@ -48,66 +56,104 @@ void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
 {
     float samp_out_left  = 0.0f;
     float samp_out_right = 0.0f;
-    float samp_out       = 0.0f;
-    float mixKnobLevel   = hardware.adc.GetFloat(0);
 
+    float mixKnobLevel     = hardware.adc.GetFloat(0);
     float volumeKnob1Level = hardware.adc.GetFloat(1);
     float volumeKnob2Level = hardware.adc.GetFloat(2);
 
-    // For now it is mono to both outputs
     for(size_t i = 0; i < size; i += 2)
     {
-        // stream samplers
-        samp_out_left += s162f(sampler1Left.Stream());
-        samp_out_right += s162f(sampler1Right.Stream());
-
         if(SAMPLE_1_ENABLED)
         {
-            // Storm
-            float sampler1Output = s162f(sampler1.Stream());
-            sampler1Output *= volumeKnob1Level; // Apply volume level
-            sampler1Output *= 1.8f;             // Normalisation
-            samp_out += sampler1Output;
+            // Waves
+            float left  = s162f(sampler1Left.Stream());
+            float right = s162f(sampler1Right.Stream());
+            left *= volumeKnob1Level;  // Apply volume level
+            right *= volumeKnob1Level; // Apply volume level
+            left *= 0.6f;              // Normalisation
+            right *= 0.6f;             // Normalisation
+            samp_out_left += left;
+            samp_out_right += right;
         }
         if(SAMPLE_2_ENABLED)
         {
-            // Waves
-            float sampler2Output = s162f(sampler2.Stream());
-            sampler2Output *= volumeKnob2Level; // Apply volume level
-            sampler2Output *= 0.6f;             // Normalisation
-            samp_out += sampler2Output;
+            // Birds
+            float normalize = 1.2f;
+            float left      = s162f(sampler2Left.Stream());
+            float right     = s162f(sampler2Right.Stream());
+            left *= volumeKnob2Level;  // Apply volume level
+            right *= volumeKnob2Level; // Apply volume level
+            left *= normalize;         // Normalisation
+            right *= normalize;        // Normalisation
+            samp_out_left += left;
+            samp_out_right += right;
         }
         if(SAMPLE_3_ENABLED)
         {
-            float sampler3Output = s162f(sampler3.Stream());
-            samp_out += sampler3Output;
+            float left  = s162f(sampler3Left.Stream());
+            float right = s162f(sampler3Right.Stream());
+            // left *= volumeKnob1Level;  // Apply volume level
+            // right *= volumeKnob1Level; // Apply volume level
+            left *= 0.6f;  // Normalisation
+            right *= 0.6f; // Normalisation
+            samp_out_left += left;
+            samp_out_right += right;
         }
         if(SAMPLE_4_ENABLED)
         {
-            float sampler4Output = s162f(sampler4.Stream());
-            samp_out += sampler4Output;
+            float left  = s162f(sampler4Left.Stream());
+            float right = s162f(sampler4Right.Stream());
+            // left *= volumeKnob1Level;  // Apply volume level
+            // right *= volumeKnob1Level; // Apply volume level
+            left *= 0.6f;  // Normalisation
+            right *= 0.6f; // Normalisation
+            samp_out_left += left;
+            samp_out_right += right;
         }
         if(SAMPLE_5_ENABLED)
         {
-            float sampler5Output = s162f(sampler5.Stream());
-            samp_out += sampler5Output;
+            float left  = s162f(sampler5Left.Stream());
+            float right = s162f(sampler5Right.Stream());
+            // left *= volumeKnob1Level;  // Apply volume level
+            // right *= volumeKnob1Level; // Apply volume level
+            left *= 0.6f;  // Normalisation
+            right *= 0.6f; // Normalisation
+            samp_out_left += left;
+            samp_out_right += right;
         }
         if(SAMPLE_6_ENABLED)
         {
-            float sampler6Output = s162f(sampler6.Stream());
-            samp_out += sampler6Output;
+            float left  = s162f(sampler6Left.Stream());
+            float right = s162f(sampler6Right.Stream());
+            // left *= volumeKnob1Level;  // Apply volume level
+            // right *= volumeKnob1Level; // Apply volume level
+            left *= 0.6f;  // Normalisation
+            right *= 0.6f; // Normalisation
+            samp_out_left += left;
+            samp_out_right += right;
         }
         if(SAMPLE_7_ENABLED)
         {
-            float sampler7Output = s162f(sampler7.Stream());
-            samp_out += sampler7Output;
+            float left  = s162f(sampler7Left.Stream());
+            float right = s162f(sampler7Right.Stream());
+            // left *= volumeKnob1Level;  // Apply volume level
+            // right *= volumeKnob1Level; // Apply volume level
+            left *= 0.6f;  // Normalisation
+            right *= 0.6f; // Normalisation
+            samp_out_left += left;
+            samp_out_right += right;
         }
         if(SAMPLE_8_ENABLED)
         {
-            float sampler8Output = s162f(sampler8.Stream());
-            samp_out += sampler8Output;
+            float left  = s162f(sampler8Left.Stream());
+            float right = s162f(sampler8Right.Stream());
+            // left *= volumeKnob1Level;  // Apply volume level
+            // right *= volumeKnob1Level; // Apply volume level
+            left *= 0.6f;  // Normalisation
+            right *= 0.6f; // Normalisation
+            samp_out_left += left;
+            samp_out_right += right;
         }
-        // out[i] = out[i + 1] = samp_out * .25f * mixKnobLevel;
         out[i]     = samp_out_left *= .25f * mixKnobLevel;
         out[i + 1] = samp_out_right *= .25f * mixKnobLevel;
     }
@@ -122,16 +168,10 @@ int main(void)
     hardware.SetAudioBlockSize(24);
     // hardware.StartLog(true);
 
-    // System::Delay(1000);
-
-    // hardware.PrintLine("INITIALIZING...");
-    // printf("TEST123");
-    // fflush(stdout);
-
     // Initialize SD card
     SdmmcHandler::Config sd_cfg;
     sd_cfg.Defaults();
-    // sd_cfg.speed = daisy::SdmmcHandler::Speed::FAST;
+    sd_cfg.speed = daisy::SdmmcHandler::Speed::FAST;
     sd_cfg.width = daisy::SdmmcHandler::BusWidth::BITS_1;
     sdcard.Init(sd_cfg);
     fsi.Init(FatFSInterface::Config::MEDIA_SD);
@@ -143,103 +183,22 @@ int main(void)
         asm("bkpt 255");
     }
     hardware.PrintLine("ok!");
-    // System::Delay(1000);
 
-    // Initialize first sampler on /waves-left
-    if(int result = sampler1Left.Init("0:/waves-left", bufferLeft, BUFSIZE, 1))
-    {
-        hardware.PrintLine("did not initialize sampler1Left - err %d", result);
-        asm("bkpt 255");
-    }
-    hardware.PrintLine("sampler1Left - loaded %d files",
-                       sampler1Left.GetNumberFiles());
-    // System::Delay(500);
-
-    // Initialize second sampler on /waves-right
-    if(int result
-       = sampler1Right.Init("0:/waves-right", bufferRight, BUFSIZE, 1))
-    {
-        hardware.PrintLine("did not initialize sampler1Right - err %d", result);
-        asm("bkpt 255");
-    }
-    hardware.PrintLine("sampler1Right - loaded %d files",
-                       sampler1Right.GetNumberFiles());
-    // System::Delay(500);
-    // f_mount(&fsi.GetSDFileSystem(), "/", 1);
-
-    std::string sdPath = fsi.GetSDPath();
-
-    // Set samplers to looping
+    // Sample 1 - Waves
+    sampler1Left.Init("0:/waves-left", sample1BufferLeft, BUFSIZE, 1);
+    sampler1Right.Init("0:/waves-right", sample1BufferRight, BUFSIZE, 1);
     sampler1Left.SetLooping(true);
     sampler1Right.SetLooping(true);
-
-    // Open audio files in samplers
     sampler1Left.Open(0);
     sampler1Right.Open(0);
 
-    // CONFIGURE SAMPLER
-    // 1: birds-dutch
-    // 2: cat purring
-    // 3: crickets
-    // 4: crickets?
-    // 5: stream A
-    // 6: oystercatcher
-    // 7: stream B
-    // 8: stream C ?
-    // 9: stream
-    // 10: stream
-    // 11: stream
-    // 12: stream
-
-    /* if(SAMPLE_1_ENABLED)
-    {
-        sampler1.Init(sdPath.c_str());
-        sampler1.SetLooping(true);
-        sampler1.Open(1); //closest knob
-    }
-    if(SAMPLE_2_ENABLED)
-    {
-        sampler2.Init(sdPath.c_str());
-        sampler2.SetLooping(true);
-        sampler2.Open(3); //farthest knob
-    }
-    if(SAMPLE_3_ENABLED)
-    {
-        sampler3.Init(sdPath.c_str());
-        sampler3.SetLooping(true);
-        sampler3.Open(1);
-    }
-    if(SAMPLE_4_ENABLED)
-    {
-        sampler4.Init(sdPath.c_str());
-        sampler4.SetLooping(true);
-        sampler4.Open(3);
-    }
-    if(SAMPLE_5_ENABLED)
-    {
-        sampler5.Init(sdPath.c_str());
-        sampler5.SetLooping(true);
-        sampler5.Open(1);
-    }
-    if(SAMPLE_6_ENABLED)
-    {
-        sampler6.Init(sdPath.c_str());
-        sampler6.SetLooping(true);
-        sampler6.Open(3);
-    }
-    if(SAMPLE_7_ENABLED)
-    {
-        sampler7.Init(sdPath.c_str());
-        sampler7.SetLooping(true);
-        sampler7.Open(1);
-    }
-    if(SAMPLE_8_ENABLED)
-    {
-        sampler8.Init(sdPath.c_str());
-        sampler8.SetLooping(true);
-        sampler8.Open(3);
-    } */
-
+    // Sample 2 - Birds
+    sampler2Left.Init("0:/birds-left", sample2BufferLeft, BUFSIZE, 1);
+    sampler2Right.Init("0:/birds-right", sample2BufferRight, BUFSIZE, 1);
+    sampler2Left.SetLooping(true);
+    sampler2Right.SetLooping(true);
+    sampler2Left.Open(0);
+    sampler2Right.Open(0);
 
     // Initialize controls and led
     float            samplerate = hardware.AudioSampleRate(); // per second
@@ -263,53 +222,45 @@ int main(void)
     // Loop forever
     for(;;)
     {
-        // prepare samples for sampler 1; manage errors
-        if(int result = sampler1Left.Prepare())
-        {
-            hardware.PrintLine("ERROR WHILE PREPARING sampler1Left - err %d",
-                               result);
-            asm("bkpt 255");
-        }
-
-        // prepare samples for sampler 2; manage errors
-        if(int result = sampler1Right.Prepare())
-        {
-            hardware.PrintLine("ERROR WHILE PREPARING sampler1Right - err %d",
-                               result);
-            asm("bkpt 255");
-        }
-
         if(SAMPLE_1_ENABLED)
         {
-            sampler1.Prepare();
+            sampler1Left.Prepare();
+            sampler1Right.Prepare();
         }
         if(SAMPLE_2_ENABLED)
         {
-            sampler2.Prepare();
+            sampler2Left.Prepare();
+            sampler2Right.Prepare();
         }
         if(SAMPLE_3_ENABLED)
         {
-            sampler3.Prepare();
+            sampler3Left.Prepare();
+            sampler3Right.Prepare();
         }
         if(SAMPLE_4_ENABLED)
         {
-            sampler4.Prepare();
+            sampler4Left.Prepare();
+            sampler4Right.Prepare();
         }
         if(SAMPLE_5_ENABLED)
         {
-            sampler5.Prepare();
+            sampler5Left.Prepare();
+            sampler5Right.Prepare();
         }
         if(SAMPLE_6_ENABLED)
         {
-            sampler6.Prepare();
+            sampler6Left.Prepare();
+            sampler6Right.Prepare();
         }
         if(SAMPLE_7_ENABLED)
         {
-            sampler7.Prepare();
+            sampler7Left.Prepare();
+            sampler7Right.Prepare();
         }
         if(SAMPLE_8_ENABLED)
         {
-            sampler8.Prepare();
+            sampler8Left.Prepare();
+            sampler8Right.Prepare();
         }
     }
 }
