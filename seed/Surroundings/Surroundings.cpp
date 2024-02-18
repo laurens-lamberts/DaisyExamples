@@ -52,15 +52,6 @@ int16_t DSY_SDRAM_BSS sample7BufferRight[BUFSIZE];
 int16_t DSY_SDRAM_BSS sample8BufferLeft[BUFSIZE];
 int16_t DSY_SDRAM_BSS sample8BufferRight[BUFSIZE];
 
-#define SAMPLE_1_ENABLED true
-#define SAMPLE_2_ENABLED true
-#define SAMPLE_3_ENABLED true
-#define SAMPLE_4_ENABLED false
-#define SAMPLE_5_ENABLED false
-#define SAMPLE_6_ENABLED false
-#define SAMPLE_7_ENABLED false
-#define SAMPLE_8_ENABLED false
-
 constexpr int NUMBER_OF_ADC_CHANNELS = 4;
 
 void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
@@ -82,78 +73,30 @@ void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
 
     for(size_t i = 0; i < size; i += 2)
     {
-        if(SAMPLE_1_ENABLED)
-        {
-            float left  = s162f(sampler1Left.Stream());
-            float right = s162f(sampler1Right.Stream());
-            left *= volumeKnob1Level;  // Apply volume level
-            right *= volumeKnob1Level; // Apply volume level
-            samp_out_left += left;
-            samp_out_right += right;
-        }
-        if(SAMPLE_2_ENABLED)
-        {
-            float left  = s162f(sampler2Left.Stream());
-            float right = s162f(sampler2Right.Stream());
-            left *= volumeKnob2Level;  // Apply volume level
-            right *= volumeKnob2Level; // Apply volume level
-            samp_out_left += left;
-            samp_out_right += right;
-        }
-        if(SAMPLE_3_ENABLED)
-        {
-            float left  = s162f(sampler3Left.Stream());
-            float right = s162f(sampler3Right.Stream());
-            left *= volumeKnob3Level;  // Apply volume level
-            right *= volumeKnob3Level; // Apply volume level
-            samp_out_left += left;
-            samp_out_right += right;
-        }
-        if(SAMPLE_4_ENABLED)
-        {
-            float left  = s162f(sampler4Left.Stream());
-            float right = s162f(sampler4Right.Stream());
-            left *= volumeKnob4Level;  // Apply volume level
-            right *= volumeKnob4Level; // Apply volume level
-            samp_out_left += left;
-            samp_out_right += right;
-        }
-        if(SAMPLE_5_ENABLED)
-        {
-            float left  = s162f(sampler5Left.Stream());
-            float right = s162f(sampler5Right.Stream());
-            left *= volumeKnob5Level;  // Apply volume level
-            right *= volumeKnob5Level; // Apply volume level
-            samp_out_left += left;
-            samp_out_right += right;
-        }
-        if(SAMPLE_6_ENABLED)
-        {
-            float left  = s162f(sampler6Left.Stream());
-            float right = s162f(sampler6Right.Stream());
-            left *= volumeKnob6Level;  // Apply volume level
-            right *= volumeKnob6Level; // Apply volume level
-            samp_out_left += left;
-            samp_out_right += right;
-        }
-        if(SAMPLE_7_ENABLED)
-        {
-            float left  = s162f(sampler7Left.Stream());
-            float right = s162f(sampler7Right.Stream());
-            left *= volumeKnob7Level;  // Apply volume level
-            right *= volumeKnob7Level; // Apply volume level
-            samp_out_left += left;
-            samp_out_right += right;
-        }
-        if(SAMPLE_8_ENABLED)
-        {
-            float left  = s162f(sampler8Left.Stream());
-            float right = s162f(sampler8Right.Stream());
-            left *= volumeKnob8Level;  // Apply volume level
-            right *= volumeKnob8Level; // Apply volume level
-            samp_out_left += left;
-            samp_out_right += right;
-        }
+        samp_out_left += s162f(sampler1Left.Stream()) * volumeKnob1Level;
+        samp_out_right += s162f(sampler1Right.Stream()) * volumeKnob1Level;
+
+        samp_out_left += s162f(sampler2Left.Stream()) * volumeKnob2Level;
+        samp_out_right += s162f(sampler2Right.Stream()) * volumeKnob2Level;
+
+        samp_out_left += s162f(sampler3Left.Stream()) * volumeKnob3Level;
+        samp_out_right += s162f(sampler3Right.Stream()) * volumeKnob3Level;
+
+        samp_out_left += s162f(sampler4Left.Stream()) * volumeKnob4Level;
+        samp_out_right += s162f(sampler4Right.Stream()) * volumeKnob4Level;
+
+        samp_out_left += s162f(sampler5Left.Stream()) * volumeKnob5Level;
+        samp_out_right += s162f(sampler5Right.Stream()) * volumeKnob5Level;
+
+        samp_out_left += s162f(sampler6Left.Stream()) * volumeKnob6Level;
+        samp_out_right += s162f(sampler6Right.Stream()) * volumeKnob6Level;
+
+        samp_out_left += s162f(sampler7Left.Stream()) * volumeKnob7Level;
+        samp_out_right += s162f(sampler7Right.Stream()) * volumeKnob7Level;
+
+        samp_out_left += s162f(sampler8Left.Stream()) * volumeKnob8Level;
+        samp_out_right += s162f(sampler8Right.Stream()) * volumeKnob8Level;
+
         out[i]     = samp_out_left *= .25f * mixKnobLevel;
         out[i + 1] = samp_out_right *= .25f * mixKnobLevel;
     }
@@ -218,46 +161,22 @@ void InitPotsAndLED()
 
 void BufferSamplers()
 {
-    if(SAMPLE_1_ENABLED)
-    {
-        sampler1Left.Prepare();
-        sampler1Right.Prepare();
-    }
-    if(SAMPLE_2_ENABLED)
-    {
-        sampler2Left.Prepare();
-        sampler2Right.Prepare();
-    }
-    if(SAMPLE_3_ENABLED)
-    {
-        sampler3Left.Prepare();
-        sampler3Right.Prepare();
-    }
-    if(SAMPLE_4_ENABLED)
-    {
-        sampler4Left.Prepare();
-        sampler4Right.Prepare();
-    }
-    if(SAMPLE_5_ENABLED)
-    {
-        sampler5Left.Prepare();
-        sampler5Right.Prepare();
-    }
-    if(SAMPLE_6_ENABLED)
-    {
-        sampler6Left.Prepare();
-        sampler6Right.Prepare();
-    }
-    if(SAMPLE_7_ENABLED)
-    {
-        sampler7Left.Prepare();
-        sampler7Right.Prepare();
-    }
-    if(SAMPLE_8_ENABLED)
-    {
-        sampler8Left.Prepare();
-        sampler8Right.Prepare();
-    }
+    sampler1Left.Prepare();
+    sampler1Right.Prepare();
+    sampler2Left.Prepare();
+    sampler2Right.Prepare();
+    sampler3Left.Prepare();
+    sampler3Right.Prepare();
+    sampler4Left.Prepare();
+    sampler4Right.Prepare();
+    sampler5Left.Prepare();
+    sampler5Right.Prepare();
+    sampler6Left.Prepare();
+    sampler6Right.Prepare();
+    sampler7Left.Prepare();
+    sampler7Right.Prepare();
+    sampler8Left.Prepare();
+    sampler8Right.Prepare();
 }
 
 int main(void)
@@ -268,27 +187,63 @@ int main(void)
 
     InitSDCard();
 
-    // Sampler 1 - Waves
+    // Sampler 1 - Rain - rain-light, (rain-heavy), (rain-roof)
     InitSampler(sampler1Left,
                 sampler1Right,
-                "0:/waves/waves-river/left",
-                "0:/waves/waves-river/right",
-                sample1BufferLeft,
-                sample1BufferRight);
-    // Sampler 2 - Birds
-    InitSampler(sampler2Left,
-                sampler2Right,
-                "0:/birds/birds-dutch/left",
-                "0:/birds/birds-dutch/right",
-                sample2BufferLeft,
-                sample2BufferRight);
-    // Sampler 3 - Rain
-    InitSampler(sampler3Left,
-                sampler3Right,
                 "0:/rain/rain-light/left",
                 "0:/rain/rain-light/right",
+                sample1BufferLeft,
+                sample1BufferRight);
+    // Sampler 2 - Storm - storm
+    InitSampler(sampler2Left,
+                sampler2Right,
+                "0:/storm/storm/left",
+                "0:/storm/storm/right",
+                sample2BufferLeft,
+                sample2BufferRight);
+    // Sampler 3 - Noise - (wind), noise/stone-factory
+    InitSampler(sampler3Left,
+                sampler3Right,
+                "0:/noise/stone-factory/left",
+                "0:/noise/stone-factory/right",
                 sample3BufferLeft,
                 sample3BufferRight);
+    // Sampler 4 - Birds - birds-dutch, (birds-nz)
+    InitSampler(sampler4Left,
+                sampler4Right,
+                "0:/birds/birds-dutch/left",
+                "0:/birds/birds-dutch/right",
+                sample4BufferLeft,
+                sample4BufferRight);
+    // Sampler 5 - Crickets - crickets-dutch, cicada, cat-purring
+    InitSampler(sampler5Left,
+                sampler5Right,
+                "0:/crickets/crickets-dutch/left",
+                "0:/crickets/crickets-dutch/right",
+                sample5BufferLeft,
+                sample5BufferRight);
+    // Sampler 6 - Near-water animals - seagulls, frogs, (ducks), oystercatchers
+    InitSampler(sampler6Left,
+                sampler6Right,
+                "0:/near-water-animals/seagulls/left",
+                "0:/near-water-animals/seagulls/right",
+                sample6BufferLeft,
+                sample6BufferRight);
+    // Sampler 7 - Water streams - stream-light, stream-heavy, (waterfall)
+    InitSampler(sampler7Left,
+                sampler7Right,
+                "0:/water-streams/stream-light/left",
+                "0:/water-streams/stream-light/right",
+                sample7BufferLeft,
+                sample7BufferRight);
+    // Sampler 8 - Waves - waves-river, (waves-sea), (rattling-boatlines)
+    InitSampler(sampler8Left,
+                sampler8Right,
+                "0:/waves/waves-river/left",
+                "0:/waves/waves-river/right",
+                sample8BufferLeft,
+                sample8BufferRight);
+
 
     InitPotsAndLED();
 
