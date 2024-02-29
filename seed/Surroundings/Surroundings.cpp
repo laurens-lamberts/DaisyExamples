@@ -156,19 +156,11 @@ void InitPotsAndLED()
     led1.Init(seed::A6, false, samplerate / 48.f); // red LED
 
     adcConfig[0].InitSingle(seed::A0); // mix potentiometer
-    // adcConfig[1].InitSingle(hardware.GetPin(16)); // sample1 potentiometer
-    // adcConfig[2].InitSingle(hardware.GetPin(17)); // sample2 potentiometer
-    // adcConfig[3].InitSingle(hardware.GetPin(18)); // sample3 potentiometer
 
     // One channel configured for 8 inputs via CD4051 mux.
-    adcConfig[1].InitMux(seed::A1,
-                         8, // only three pots for now (testing)
-                         seed::D7,
-                         seed::D8,
-                         seed::D9);
+    adcConfig[1].InitMux(seed::A1, 8, seed::D7, seed::D8, seed::D9);
 
-    hardware.adc.Init(adcConfig,
-                      NUMBER_OF_ADC_CHANNELS); // Has to be >8 channels later
+    hardware.adc.Init(adcConfig, NUMBER_OF_ADC_CHANNELS);
     hardware.adc.Start();
 }
 
