@@ -34,7 +34,7 @@ AnalogControl pot1;
 
 // define buffers
 // these are initialized globally on the SDRAM memory sector
-#define BUFSIZE 4096
+#define BUFSIZE 65536
 int16_t DSY_SDRAM_BSS sample1BufferLeft[BUFSIZE];
 int16_t DSY_SDRAM_BSS sample1BufferRight[BUFSIZE];
 int16_t DSY_SDRAM_BSS sample2BufferLeft[BUFSIZE];
@@ -52,7 +52,12 @@ int16_t DSY_SDRAM_BSS sample7BufferRight[BUFSIZE];
 int16_t DSY_SDRAM_BSS sample8BufferLeft[BUFSIZE];
 int16_t DSY_SDRAM_BSS sample8BufferRight[BUFSIZE];
 
-constexpr int NUMBER_OF_ADC_CHANNELS = 4;
+constexpr int NUMBER_OF_ADC_CHANNELS = 2;
+
+float intToFloat(uint16_t in)
+{
+    return static_cast<float>(in) / 65536.0f;
+}
 
 void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
                    AudioHandle::InterleavingOutputBuffer out,
@@ -61,15 +66,18 @@ void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
     float samp_out_left  = 0.0f;
     float samp_out_right = 0.0f;
 
-    float mixKnobLevel     = hardware.adc.GetFloat(0);
-    float volumeKnob1Level = hardware.adc.GetFloat(1);
-    float volumeKnob2Level = hardware.adc.GetFloat(2);
-    float volumeKnob3Level = hardware.adc.GetFloat(3);
-    float volumeKnob4Level = 0.1f;
-    float volumeKnob5Level = 0.1f;
-    float volumeKnob6Level = 0.1f;
-    float volumeKnob7Level = 0.1f;
-    float volumeKnob8Level = 0.1f;
+    float mixKnobLevel = hardware.adc.GetFloat(0);
+    float volumeKnob1Level
+        = intToFloat(hardware.adc.GetMux(1, 0)); //hardware.adc.GetFloat(1);
+    float volumeKnob2Level
+        = intToFloat(hardware.adc.GetMux(1, 1)); //hardware.adc.GetFloat(2);
+    float volumeKnob3Level
+        = intToFloat(hardware.adc.GetMux(1, 2)); //hardware.adc.GetFloat(3);
+    float volumeKnob4Level = 0.0f;
+    float volumeKnob5Level = 0.0f;
+    float volumeKnob6Level = 0.0f;
+    float volumeKnob7Level = 0.0f;
+    float volumeKnob8Level = 0.0f;
 
     for(size_t i = 0; i < size; i += 2)
     {
@@ -145,14 +153,19 @@ void InitPotsAndLED()
     float            samplerate = hardware.AudioSampleRate(); // per second
     AdcChannelConfig adcConfig
         [NUMBER_OF_ADC_CHANNELS]; // Create an array of AdcChannelConfig
-    led1.Init(hardware.GetPin(21), false, samplerate / 48.f); // red LED
+    led1.Init(seed::A6, false, samplerate / 48.f); // red LED
 
-    // pot1.Init(hardware.adc.GetPtr(0), samplerate, false, false, 0.002f);
+    adcConfig[0].InitSingle(seed::A0); // mix potentiometer
+    // adcConfig[1].InitSingle(hardware.GetPin(16)); // sample1 potentiometer
+    // adcConfig[2].InitSingle(hardware.GetPin(17)); // sample2 potentiometer
+    // adcConfig[3].InitSingle(hardware.GetPin(18)); // sample3 potentiometer
 
-    adcConfig[0].InitSingle(hardware.GetPin(15)); // mix potentiometer
-    adcConfig[1].InitSingle(hardware.GetPin(16)); // sample1 potentiometer
-    adcConfig[2].InitSingle(hardware.GetPin(17)); // sample2 potentiometer
-    adcConfig[3].InitSingle(hardware.GetPin(18)); // sample3 potentiometer
+    // One channel configured for 8 inputs via CD4051 mux.
+    adcConfig[1].InitMux(seed::A1,
+                         8, // only three pots for now (testing)
+                         seed::D7,
+                         seed::D8,
+                         seed::D9);
 
     hardware.adc.Init(adcConfig,
                       NUMBER_OF_ADC_CHANNELS); // Has to be >8 channels later
@@ -182,7 +195,7 @@ void BufferSamplers()
 int main(void)
 {
     hardware.Init();
-    hardware.SetAudioBlockSize(24);
+    hardware.SetAudioBlockSize(256);
     // hardware.StartLog(true);
 
     InitSDCard();
@@ -243,7 +256,6 @@ int main(void)
                 "0:/waves/waves-river/right",
                 sample8BufferLeft,
                 sample8BufferRight);
-
 
     InitPotsAndLED();
 
