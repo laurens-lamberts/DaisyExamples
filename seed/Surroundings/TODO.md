@@ -5,3 +5,5 @@
 3. I need my audio files to form a perfect loop. i'm confident my audio files are bounced in a perfect loop, but every time the WavPlayer loops my audio file, I hear an audio freeze of (I guess) 50-100ms, until it repeats. I think it may have something to do with how the audio buffer end is reached, and it should buffer from the start seamlessly.
 
 4. After a while of playback, the program seems to hang in a one-second (or so) loop sometimes.
+
+5. LED flickering (PWM)

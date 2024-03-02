@@ -30,7 +30,9 @@ WavPlayer      sampler8Left;
 WavPlayer      sampler8Right;
 
 Led           led1;
+RgbLed        rgbLed1;
 AnalogControl pot1;
+Switch        button1;
 
 // define buffers
 // these are initialized globally on the SDRAM memory sector
@@ -57,6 +59,35 @@ constexpr int NUMBER_OF_ADC_CHANNELS = 2;
 float intToFloat(uint16_t in)
 {
     return static_cast<float>(in) / 65536.0f;
+}
+struct RGB
+{
+    float r;
+    float g;
+    float b;
+};
+
+RGB hsvToRgb(float h, float s, float v)
+{
+    float r, g, b;
+
+    int   i = int(h * 6);
+    float f = h * 6 - i;
+    float p = v * (1 - s);
+    float q = v * (1 - f * s);
+    float t = v * (1 - (1 - f) * s);
+
+    switch(i % 6)
+    {
+        case 0: r = v, g = t, b = p; break;
+        case 1: r = q, g = v, b = p; break;
+        case 2: r = p, g = v, b = t; break;
+        case 3: r = p, g = q, b = v; break;
+        case 4: r = t, g = p, b = v; break;
+        case 5: r = v, g = p, b = q; break;
+    }
+
+    return {r, g, b};
 }
 
 void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
@@ -109,8 +140,24 @@ void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
         out[i + 1] = samp_out_right *= .25f * mixKnobLevel;
     }
 
+    // Debounce the button
+    button1.Debounce();
+
     led1.Set(1.f * volumeKnob1Level);
     led1.Update();
+
+    if(button1.Pressed())
+    {
+        // Cycle through presets and show the selected one on the RGB LED
+        RGB color = hsvToRgb(volumeKnob1Level, 1.0f, 1.0f);
+        rgbLed1.Set(color.r, color.g, color.b);
+    }
+    if(button1.FallingEdge())
+    {
+        // TODO: just released. Save selected preset.
+    }
+    // rgbLed1.Set(0.0f, 0.0f, 0.6f);
+    rgbLed1.Update();
 }
 
 void InitSampler(WavPlayer&  samplerLeft,
@@ -147,13 +194,17 @@ void InitSDCard()
     hardware.PrintLine("ok!");
 }
 
-void InitPotsAndLED()
+void InitPotsButtonsAndLED()
 {
     // Initialize controls and led
     float            samplerate = hardware.AudioSampleRate(); // per second
     AdcChannelConfig adcConfig
         [NUMBER_OF_ADC_CHANNELS]; // Create an array of AdcChannelConfig
+
     led1.Init(seed::A6, false, samplerate / 48.f); // red LED
+    rgbLed1.Init(seed::D11, seed::D12, seed::D13, true);
+
+    button1.Init(seed::A5, 1000); // to be updated at a 1kHz samplerate
 
     adcConfig[0].InitSingle(seed::A0); // mix potentiometer
 
@@ -249,14 +300,14 @@ int main(void)
                 sample8BufferLeft,
                 sample8BufferRight);
 
-    InitPotsAndLED();
+    InitPotsButtonsAndLED();
 
     // Start audio
     hardware.Print("starting audio...");
     hardware.StartAudio(AudioCallback);
     hardware.PrintLine("ok!");
 
-    while(true)
+    for(;;)
     {
         BufferSamplers();
     }
