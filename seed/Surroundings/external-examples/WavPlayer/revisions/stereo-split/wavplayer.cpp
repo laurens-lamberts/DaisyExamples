@@ -1,13 +1,13 @@
 #include <cstring>
-#include "hid/wavplayer.h"
+#include "wavplayer.h"
 #include "daisy_seed.h"
 
 using namespace daisy;
 
-FRESULT WavPlayer::Init(const char *search_path,
-                        int16_t    *buffer,
-                        size_t      bufferSize,
-                        size_t      numChannels)
+FRESULT WavPlayerCustom::Init(const char *search_path,
+                              int16_t    *buffer,
+                              size_t      bufferSize,
+                              size_t      numChannels)
 {
     buff_        = buffer;
     bufferSize_  = bufferSize / numChannels;
@@ -104,7 +104,7 @@ FRESULT WavPlayer::Init(const char *search_path,
 }
 
 
-int WavPlayer::Open(size_t sel)
+int WavPlayerCustom::Open(size_t sel)
 {
     if(sel != file_sel_)
     {
@@ -130,7 +130,7 @@ int WavPlayer::Open(size_t sel)
     }
 }
 
-int WavPlayer::OpenById(const char *id)
+int WavPlayerCustom::OpenById(const char *id)
 {
     // add extension
     // find index based on filename
@@ -150,12 +150,12 @@ int WavPlayer::OpenById(const char *id)
         return FR_INVALID_NAME;
 }
 
-int WavPlayer::Close()
+int WavPlayerCustom::Close()
 {
     return f_close(&fil_);
 }
 
-int16_t WavPlayer::Stream()
+int16_t WavPlayerCustom::Stream()
 {
     int16_t samp;
     if(playing_)
@@ -181,7 +181,7 @@ int16_t WavPlayer::Stream()
     return samp;
 }
 
-int WavPlayer::Prepare()
+int WavPlayerCustom::Prepare()
 {
     FRESULT readres = FR_OK;
 
@@ -217,14 +217,14 @@ int WavPlayer::Prepare()
     return readres;
 }
 
-void WavPlayer::Restart()
+void WavPlayerCustom::Restart()
 {
     f_lseek(&fil_,
             sizeof(WAV_FormatTypeDef)
                 + file_info_[file_sel_].raw_data.SubChunk1Size);
 }
 
-WavPlayer::BufferState WavPlayer::GetNextBuffState()
+WavPlayerCustom::BufferState WavPlayerCustom::GetNextBuffState()
 {
     size_t next_samp;
     next_samp = (read_ptr_ + 1) % bufferSize_;
@@ -238,7 +238,7 @@ WavPlayer::BufferState WavPlayer::GetNextBuffState()
     }
 }
 
-uint32_t WavPlayer::TimeUntilEOF()
+uint32_t WavPlayerCustom::TimeUntilEOF()
 {
     if(!playing_)
         return 0;

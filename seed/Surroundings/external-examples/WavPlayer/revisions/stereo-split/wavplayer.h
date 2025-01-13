@@ -36,7 +36,7 @@ TODO:
 /** Wav Player that will load .wav files from an SD Card,
 and then provide a method of accessing the samples with
 double-buffering. */
-class WavPlayer
+class WavPlayerCustom
 {
   public:
     WavPlayer() {}
