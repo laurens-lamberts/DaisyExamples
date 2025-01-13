@@ -34,26 +34,6 @@ RgbLed        rgbLed1;
 AnalogControl pot1;
 Switch        button1;
 
-// define buffers
-// these are initialized globally on the SDRAM memory sector
-#define BUFSIZE 65536
-int16_t DSY_SDRAM_BSS sample1BufferLeft[BUFSIZE];
-int16_t DSY_SDRAM_BSS sample1BufferRight[BUFSIZE];
-int16_t DSY_SDRAM_BSS sample2BufferLeft[BUFSIZE];
-int16_t DSY_SDRAM_BSS sample2BufferRight[BUFSIZE];
-int16_t DSY_SDRAM_BSS sample3BufferLeft[BUFSIZE];
-int16_t DSY_SDRAM_BSS sample3BufferRight[BUFSIZE];
-int16_t DSY_SDRAM_BSS sample4BufferLeft[BUFSIZE];
-int16_t DSY_SDRAM_BSS sample4BufferRight[BUFSIZE];
-int16_t DSY_SDRAM_BSS sample5BufferLeft[BUFSIZE];
-int16_t DSY_SDRAM_BSS sample5BufferRight[BUFSIZE];
-int16_t DSY_SDRAM_BSS sample6BufferLeft[BUFSIZE];
-int16_t DSY_SDRAM_BSS sample6BufferRight[BUFSIZE];
-int16_t DSY_SDRAM_BSS sample7BufferLeft[BUFSIZE];
-int16_t DSY_SDRAM_BSS sample7BufferRight[BUFSIZE];
-int16_t DSY_SDRAM_BSS sample8BufferLeft[BUFSIZE];
-int16_t DSY_SDRAM_BSS sample8BufferRight[BUFSIZE];
-
 constexpr int NUMBER_OF_ADC_CHANNELS = 2;
 
 float intToFloat(uint16_t in)
@@ -163,16 +143,23 @@ void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
 void InitSampler(WavPlayer&  samplerLeft,
                  WavPlayer&  samplerRight,
                  const char* pathLeft,
-                 const char* pathRight,
-                 int16_t*    bufferLeft,
-                 int16_t*    bufferRight)
+                 const char* pathRight)
 {
-    samplerLeft.Init(pathLeft, bufferLeft, BUFSIZE, 1);
-    samplerRight.Init(pathRight, bufferRight, BUFSIZE, 1);
+    hardware.PrintLine(
+        "Initializing sampler with paths: %s, %s", pathLeft, pathRight);
+    samplerLeft.Init(pathLeft);
+    samplerRight.Init(pathRight);
     samplerLeft.SetLooping(true);
     samplerRight.SetLooping(true);
-    samplerLeft.Open(0);
-    samplerRight.Open(0);
+    int a = samplerLeft.Open(0);
+    if(a != 0)
+    {
+        hardware.PrintLine("Failed to open samplerLeft");
+    }
+    if(samplerRight.Open(0) != 0)
+    {
+        hardware.PrintLine("Failed to open samplerRight");
+    }
 }
 
 void InitSDCard()
@@ -217,6 +204,7 @@ void InitPotsButtonsAndLED()
 
 void BufferSamplers()
 {
+    hardware.PrintLine("Buffering samplers...");
     sampler1Left.Prepare();
     sampler1Right.Prepare();
     sampler2Left.Prepare();
@@ -247,58 +235,42 @@ int main(void)
     InitSampler(sampler1Left,
                 sampler1Right,
                 "0:/rain/rain-light/left",
-                "0:/rain/rain-light/right",
-                sample1BufferLeft,
-                sample1BufferRight);
+                "0:/rain/rain-light/right");
     // Sampler 2 - Storm - storm
     InitSampler(sampler2Left,
                 sampler2Right,
-                "0:/storm/storm/left",
-                "0:/storm/storm/right",
-                sample2BufferLeft,
-                sample2BufferRight);
+                "0:/storm/storm/left/",
+                "0:/storm/storm/right/");
     // Sampler 3 - Noise - (wind), noise/stone-factory
     InitSampler(sampler3Left,
                 sampler3Right,
                 "0:/noise/stone-factory/left",
-                "0:/noise/stone-factory/right",
-                sample3BufferLeft,
-                sample3BufferRight);
+                "0:/noise/stone-factory/right");
     // Sampler 4 - Birds - birds-dutch, (birds-nz)
     InitSampler(sampler4Left,
                 sampler4Right,
                 "0:/birds/birds-dutch/left",
-                "0:/birds/birds-dutch/right",
-                sample4BufferLeft,
-                sample4BufferRight);
+                "0:/birds/birds-dutch/right");
     // Sampler 5 - Crickets - crickets-dutch, cicada, cat-purring
     InitSampler(sampler5Left,
                 sampler5Right,
                 "0:/crickets/crickets-dutch/left",
-                "0:/crickets/crickets-dutch/right",
-                sample5BufferLeft,
-                sample5BufferRight);
+                "0:/crickets/crickets-dutch/right");
     // Sampler 6 - Near-water animals - seagulls, frogs, (ducks), oystercatchers
     InitSampler(sampler6Left,
                 sampler6Right,
                 "0:/near-water-animals/seagulls/left",
-                "0:/near-water-animals/seagulls/right",
-                sample6BufferLeft,
-                sample6BufferRight);
+                "0:/near-water-animals/seagulls/right");
     // Sampler 7 - Water streams - stream-light, stream-heavy, (waterfall)
     InitSampler(sampler7Left,
                 sampler7Right,
                 "0:/water-streams/stream-light/left",
-                "0:/water-streams/stream-light/right",
-                sample7BufferLeft,
-                sample7BufferRight);
+                "0:/water-streams/stream-light/right");
     // Sampler 8 - Waves - waves-river, (waves-sea), (rattling-boatlines)
     InitSampler(sampler8Left,
                 sampler8Right,
                 "0:/waves/waves-river/left",
-                "0:/waves/waves-river/right",
-                sample8BufferLeft,
-                sample8BufferRight);
+                "0:/waves/waves-river/right");
 
     InitPotsButtonsAndLED();
 
