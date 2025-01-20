@@ -18,16 +18,16 @@ WavPlayer      sampler2Left;
 WavPlayer      sampler2Right;
 WavPlayer      sampler3Left;
 WavPlayer      sampler3Right;
-WavPlayer      sampler4Left;
-WavPlayer      sampler4Right;
-WavPlayer      sampler5Left;
-WavPlayer      sampler5Right;
-WavPlayer      sampler6Left;
-WavPlayer      sampler6Right;
-WavPlayer      sampler7Left;
-WavPlayer      sampler7Right;
-WavPlayer      sampler8Left;
-WavPlayer      sampler8Right;
+// WavPlayer      sampler4Left;
+// WavPlayer      sampler4Right;
+// WavPlayer      sampler5Left;
+// WavPlayer      sampler5Right;
+// WavPlayer      sampler6Left;
+// WavPlayer      sampler6Right;
+// WavPlayer      sampler7Left;
+// WavPlayer      sampler7Right;
+// WavPlayer      sampler8Left;
+// WavPlayer      sampler8Right;
 
 Led           led1;
 RgbLed        rgbLed1;
@@ -84,11 +84,11 @@ void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
         = intToFloat(hardware.adc.GetMux(1, 1)); //hardware.adc.GetFloat(2);
     float volumeKnob3Level
         = intToFloat(hardware.adc.GetMux(1, 2)); //hardware.adc.GetFloat(3);
-    float volumeKnob4Level = 0.0f;
-    float volumeKnob5Level = 0.0f;
-    float volumeKnob6Level = 0.0f;
-    float volumeKnob7Level = 0.0f;
-    float volumeKnob8Level = 0.0f;
+    // float volumeKnob4Level = 0.0f;
+    // float volumeKnob5Level = 0.0f;
+    // float volumeKnob6Level = 0.0f;
+    // float volumeKnob7Level = 0.0f;
+    // float volumeKnob8Level = 0.0f;
 
     for(size_t i = 0; i < size; i += 2)
     {
@@ -101,20 +101,20 @@ void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
         samp_out_left += s162f(sampler3Left.Stream()) * volumeKnob3Level;
         samp_out_right += s162f(sampler3Right.Stream()) * volumeKnob3Level;
 
-        samp_out_left += s162f(sampler4Left.Stream()) * volumeKnob4Level;
-        samp_out_right += s162f(sampler4Right.Stream()) * volumeKnob4Level;
+        // samp_out_left += s162f(sampler4Left.Stream()) * volumeKnob4Level;
+        // samp_out_right += s162f(sampler4Right.Stream()) * volumeKnob4Level;
 
-        samp_out_left += s162f(sampler5Left.Stream()) * volumeKnob5Level;
-        samp_out_right += s162f(sampler5Right.Stream()) * volumeKnob5Level;
+        // samp_out_left += s162f(sampler5Left.Stream()) * volumeKnob5Level;
+        // samp_out_right += s162f(sampler5Right.Stream()) * volumeKnob5Level;
 
-        samp_out_left += s162f(sampler6Left.Stream()) * volumeKnob6Level;
-        samp_out_right += s162f(sampler6Right.Stream()) * volumeKnob6Level;
+        // samp_out_left += s162f(sampler6Left.Stream()) * volumeKnob6Level;
+        // samp_out_right += s162f(sampler6Right.Stream()) * volumeKnob6Level;
 
-        samp_out_left += s162f(sampler7Left.Stream()) * volumeKnob7Level;
-        samp_out_right += s162f(sampler7Right.Stream()) * volumeKnob7Level;
+        // samp_out_left += s162f(sampler7Left.Stream()) * volumeKnob7Level;
+        // samp_out_right += s162f(sampler7Right.Stream()) * volumeKnob7Level;
 
-        samp_out_left += s162f(sampler8Left.Stream()) * volumeKnob8Level;
-        samp_out_right += s162f(sampler8Right.Stream()) * volumeKnob8Level;
+        // samp_out_left += s162f(sampler8Left.Stream()) * volumeKnob8Level;
+        // samp_out_right += s162f(sampler8Right.Stream()) * volumeKnob8Level;
 
         out[i]     = samp_out_left *= .25f * mixKnobLevel;
         out[i + 1] = samp_out_right *= .25f * mixKnobLevel;
@@ -136,7 +136,6 @@ void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
     {
         // TODO: just released. Save selected preset.
     }
-    // rgbLed1.Set(0.0f, 0.0f, 0.6f);
     rgbLed1.Update();
 }
 
@@ -182,6 +181,8 @@ void InitPotsButtonsAndLED()
 
     led1.Init(seed::A6, false, samplerate / 48.f); // red LED
     rgbLed1.Init(seed::D11, seed::D12, seed::D13, true);
+    rgbLed1.Set(0.0f, 0.0f, 0.0f); // Initialize with no color
+    rgbLed1.Update(); // Ensure the LED is updated to the initial color
 
     button1.Init(seed::A5, 1000); // to be updated at a 1kHz samplerate
 
@@ -202,16 +203,16 @@ void BufferSamplers()
     sampler2Right.Prepare();
     sampler3Left.Prepare();
     sampler3Right.Prepare();
-    sampler4Left.Prepare();
-    sampler4Right.Prepare();
-    sampler5Left.Prepare();
-    sampler5Right.Prepare();
-    sampler6Left.Prepare();
-    sampler6Right.Prepare();
-    sampler7Left.Prepare();
-    sampler7Right.Prepare();
-    sampler8Left.Prepare();
-    sampler8Right.Prepare();
+    // sampler4Left.Prepare();
+    // sampler4Right.Prepare();
+    // sampler5Left.Prepare();
+    // sampler5Right.Prepare();
+    // sampler6Left.Prepare();
+    // sampler6Right.Prepare();
+    // sampler7Left.Prepare();
+    // sampler7Right.Prepare();
+    // sampler8Left.Prepare();
+    // sampler8Right.Prepare();
 }
 
 int main(void)
@@ -219,6 +220,7 @@ int main(void)
     hardware.Init();
     hardware.SetAudioBlockSize(256);
 
+    InitPotsButtonsAndLED();
     InitSDCard();
 
     // Sampler 1 - Rain - rain-light, (rain-heavy), (rain-roof)
@@ -261,8 +263,6 @@ int main(void)
     //             sampler8Right,
     //             "0:/waves/waves-river/left",
     //             "0:/waves/waves-river/right");
-
-    InitPotsButtonsAndLED();
 
     // Start audio
     hardware.StartAudio(AudioCallback);
