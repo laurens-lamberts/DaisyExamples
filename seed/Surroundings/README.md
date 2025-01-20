@@ -8,12 +8,26 @@ Laurens Lamberts
 
 Ambience sample looper
 
+## Prerequisites
+
+- wavplayer.cpp in libDaisy has an error, and does not properly locate the WAV file. This has to be fixed using the following change at line 38;
+
+```cpp
+strcpy(file_info_[file_cnt_].name, search_path);
+if(search_path[strlen(search_path) - 1] != '/')
+{
+    strcat(file_info_[file_cnt_].name, "/");
+}
+```
+
+The first line above is already there. The other lines have to be added.
+
 ## How to run
 
 1. Install the Toolchain; https://github.com/electro-smith/DaisyWiki/wiki/1b.-Installing-the-Toolchain-on-Mac
 2. Ensure you opened just the "Surroundings" folder in VSCode, not a parent
 3. CMD-P --> "task build_all"
-4. Did you coneect STLINK-V3MINIE? Then run CMD-P --> "task build_and_program". Otherwise, bring the Daisy Seed to DFU mode and run CMD-P --> "task build_and_program_dfu".
+4. Did you connect STLINK-V3MINIE? Then run CMD-P --> "task build_and_program". Otherwise, bring the Daisy Seed to DFU mode and run CMD-P --> "task build_and_program_dfu".
 
 ## Debugging
 

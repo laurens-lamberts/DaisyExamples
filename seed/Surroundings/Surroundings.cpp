@@ -49,7 +49,7 @@ struct RGB
 
 RGB hsvToRgb(float h, float s, float v)
 {
-    float r, g, b;
+    float r = 0.0, g = 0.0, b = 0.0;
 
     int   i = int(h * 6);
     float f = h * 6 - i;
@@ -167,9 +167,14 @@ void InitSDCard()
     // Initialize SD card
     SdmmcHandler::Config sd_cfg;
     sd_cfg.Defaults();
-    sd_cfg.speed = daisy::SdmmcHandler::Speed::FAST;
+    // sd_cfg.speed = daisy::SdmmcHandler::Speed::SLOW;
     sd_cfg.width = daisy::SdmmcHandler::BusWidth::BITS_1;
-    sdcard.Init(sd_cfg);
+
+    if(sdcard.Init(sd_cfg) != daisy::SdmmcHandler::Result::OK)
+    {
+        hardware.PrintLine("Failed to initialize SD card");
+        return;
+    }
     fsi.Init(FatFSInterface::Config::MEDIA_SD);
 
     hardware.Print("mount...");
@@ -239,38 +244,38 @@ int main(void)
     // Sampler 2 - Storm - storm
     InitSampler(sampler2Left,
                 sampler2Right,
-                "0:/storm/storm/left/",
-                "0:/storm/storm/right/");
+                "0:/storm/storm/left",
+                "0:/storm/storm/right");
     // Sampler 3 - Noise - (wind), noise/stone-factory
     InitSampler(sampler3Left,
                 sampler3Right,
                 "0:/noise/stone-factory/left",
                 "0:/noise/stone-factory/right");
-    // Sampler 4 - Birds - birds-dutch, (birds-nz)
-    InitSampler(sampler4Left,
-                sampler4Right,
-                "0:/birds/birds-dutch/left",
-                "0:/birds/birds-dutch/right");
-    // Sampler 5 - Crickets - crickets-dutch, cicada, cat-purring
-    InitSampler(sampler5Left,
-                sampler5Right,
-                "0:/crickets/crickets-dutch/left",
-                "0:/crickets/crickets-dutch/right");
-    // Sampler 6 - Near-water animals - seagulls, frogs, (ducks), oystercatchers
-    InitSampler(sampler6Left,
-                sampler6Right,
-                "0:/near-water-animals/seagulls/left",
-                "0:/near-water-animals/seagulls/right");
-    // Sampler 7 - Water streams - stream-light, stream-heavy, (waterfall)
-    InitSampler(sampler7Left,
-                sampler7Right,
-                "0:/water-streams/stream-light/left",
-                "0:/water-streams/stream-light/right");
-    // Sampler 8 - Waves - waves-river, (waves-sea), (rattling-boatlines)
-    InitSampler(sampler8Left,
-                sampler8Right,
-                "0:/waves/waves-river/left",
-                "0:/waves/waves-river/right");
+    // // Sampler 4 - Birds - birds-dutch, (birds-nz)
+    // InitSampler(sampler4Left,
+    //             sampler4Right,
+    //             "0:/birds/birds-dutch/left",
+    //             "0:/birds/birds-dutch/right");
+    // // Sampler 5 - Crickets - crickets-dutch, cicada, cat-purring
+    // InitSampler(sampler5Left,
+    //             sampler5Right,
+    //             "0:/crickets/crickets-dutch/left",
+    //             "0:/crickets/crickets-dutch/right");
+    // // Sampler 6 - Near-water animals - seagulls, frogs, (ducks), oystercatchers
+    // InitSampler(sampler6Left,
+    //             sampler6Right,
+    //             "0:/near-water-animals/seagulls/left",
+    //             "0:/near-water-animals/seagulls/right");
+    // // Sampler 7 - Water streams - stream-light, stream-heavy, (waterfall)
+    // InitSampler(sampler7Left,
+    //             sampler7Right,
+    //             "0:/water-streams/stream-light/left",
+    //             "0:/water-streams/stream-light/right");
+    // // Sampler 8 - Waves - waves-river, (waves-sea), (rattling-boatlines)
+    // InitSampler(sampler8Left,
+    //             sampler8Right,
+    //             "0:/waves/waves-river/left",
+    //             "0:/waves/waves-river/right");
 
     InitPotsButtonsAndLED();
 
