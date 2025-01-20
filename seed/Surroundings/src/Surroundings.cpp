@@ -70,6 +70,38 @@ RGB hsvToRgb(float h, float s, float v)
     return {r, g, b};
 }
 
+void updateLEDs()
+{
+    float mixKnobLevel = hardware.adc.GetFloat(0);
+    float volumeKnob1Level
+        = intToFloat(hardware.adc.GetMux(1, 0)); //hardware.adc.GetFloat(1);
+    float volumeKnob2Level
+        = intToFloat(hardware.adc.GetMux(1, 1)); //hardware.adc.GetFloat(2);
+    float volumeKnob3Level
+        = intToFloat(hardware.adc.GetMux(1, 2)); //hardware.adc.GetFloat(3);
+
+    // led1.Set(1.f * mixKnobLevel);
+    // led1.Update();
+
+    RGB rgb = hsvToRgb(volumeKnob1Level, 1.0f, 1.0f);
+    rgbLed1.Set(rgb.r, rgb.g, rgb.b);
+    rgbLed1.Update();
+
+    // button1.Debounce();
+    // if(button1.Pressed())
+    // {
+    //     // Cycle through presets and show the selected one on the RGB LED
+    //     RGB color = hsvToRgb(1, 1.0f, 1.0f);
+    //     rgbLed1.Set(color.r, color.g, color.b);
+    // }
+    // rgbLed1.Update();
+
+    // if(button1.FallingEdge())
+    // {
+    //     // TODO: just released. Save selected preset.
+    // }
+}
+
 void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
                    AudioHandle::InterleavingOutputBuffer out,
                    size_t                                size)
@@ -120,23 +152,7 @@ void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
         out[i + 1] = samp_out_right *= .25f * mixKnobLevel;
     }
 
-    // Debounce the button
-    button1.Debounce();
-
-    led1.Set(1.f * mixKnobLevel);
-    led1.Update();
-
-    if(button1.Pressed())
-    {
-        // Cycle through presets and show the selected one on the RGB LED
-        RGB color = hsvToRgb(volumeKnob1Level, 1.0f, 1.0f);
-        rgbLed1.Set(color.r, color.g, color.b);
-    }
-    if(button1.FallingEdge())
-    {
-        // TODO: just released. Save selected preset.
-    }
-    rgbLed1.Update();
+    updateLEDs();
 }
 
 void InitSampler(WavPlayer&  samplerLeft,
@@ -218,7 +234,6 @@ void BufferSamplers()
 int main(void)
 {
     hardware.Init();
-    hardware.SetAudioBlockSize(256);
 
     InitPotsButtonsAndLED();
     InitSDCard();
@@ -264,8 +279,10 @@ int main(void)
     //             "0:/waves/waves-river/left",
     //             "0:/waves/waves-river/right");
 
-    // Start audio
-    hardware.StartAudio(AudioCallback);
+    BufferSamplers(); // first buffer before starting audio
+
+    hardware.SetAudioBlockSize(256);
+    hardware.StartAudio(AudioCallback); // start audio
 
     for(;;)
     {
