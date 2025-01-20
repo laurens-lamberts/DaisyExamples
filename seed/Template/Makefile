@@ -1,8 +1,8 @@
 # Project Name
-TARGET = Surroundings
+TARGET = Template
 
 # Sources
-CPP_SOURCES = src/Surroundings.cpp
+CPP_SOURCES = Template.cpp
 
 # Library Locations
 LIBDAISY_DIR = ../../libDaisy

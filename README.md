@@ -1,5 +1,14 @@
-<h1 align="center">Daisy Examples</h1>
+This fork houses my personal Daisy projects.
 
+- [Template](./seed/Template)
+
+- [Surroundings](./seed/Surroundings)
+- [Wardenclyffe](./seed/Wardenclyffe)
+- [Nightmare](./seed/Nightmare) (TODO)
+
+---
+
+<h1 align="center">Daisy Examples</h1>
 
 <!--CI Badges-->
 <p align="center">
@@ -64,7 +73,7 @@ Once you have the repository and the submodules (libDaisy/DaisySP) properly clon
 
 To build everything at once, run: `./rebuild_all.sh`
 
-This is a little time  consuming, and more often than not, only one example, or the libraries need to get built frequently.
+This is a little time consuming, and more often than not, only one example, or the libraries need to get built frequently.
 
 To build both libraries at once simply run:
 
@@ -75,7 +84,7 @@ This is the same as going to each library's directory and running `make`.
 This may take a few minutes depending on your computer's hardware. But should have the following output when finished:
 
 ```sh
-$ ./ci/build_libs.sh 
+$ ./ci/build_libs.sh
 building libDaisy . . .
 rm -fR build
 arm-none-eabi-ar: creating build/libdaisy.a
@@ -93,8 +102,8 @@ However, this may also take a few minutes. An individual example can be compiled
 
 ```sh
 cd seed/Blink
-$ make 
-arm-none-eabi-g++  -c -mcpu=cortex-m7 -mthumb -mfpu=fpv5-d16 -mfloat-abi=hard  -DUSE_HAL_DRIVER -DSTM32H750xx -DUSE_HAL_DRIVER -DHSE_VALUE=16000000 -DSTM32H750xx  -I../../libdaisy -I../../libdaisy/src/ -I../../libdaisy/src/usbd -I../../libdaisy/Drivers/CMSIS/Include/ -I../../libdaisy/Drivers/CMSIS/Device/ST/STM32H7xx/Include -I../../libdaisy/Drivers/STM32H7xx_HAL_Driver/Inc/ -I../../libdaisy/Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I../../libdaisy/core/ -I../../DaisySP  -O2 -Wall -Wno-missing-attributes -fasm -fdata-sections -ffunction-sections -MMD -MP -MF"build/Blink.d" 
+$ make
+arm-none-eabi-g++  -c -mcpu=cortex-m7 -mthumb -mfpu=fpv5-d16 -mfloat-abi=hard  -DUSE_HAL_DRIVER -DSTM32H750xx -DUSE_HAL_DRIVER -DHSE_VALUE=16000000 -DSTM32H750xx  -I../../libdaisy -I../../libdaisy/src/ -I../../libdaisy/src/usbd -I../../libdaisy/Drivers/CMSIS/Include/ -I../../libdaisy/Drivers/CMSIS/Device/ST/STM32H7xx/Include -I../../libdaisy/Drivers/STM32H7xx_HAL_Driver/Inc/ -I../../libdaisy/Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I../../libdaisy/core/ -I../../DaisySP  -O2 -Wall -Wno-missing-attributes -fasm -fdata-sections -ffunction-sections -MMD -MP -MF"build/Blink.d"
 -fno-exceptions -fasm -finline -finline-functions-called-once -fshort-enums -fno-move-loop-invariants -fno-unwind-tables  -std=gnu++14 -Wa,-a,-ad,-alms=build/Blink.lst Blink.cpp -o build/Blink.o
 arm-none-eabi-g++  build/system_stm32h7xx.o build/startup_stm32h750xx.o build/Blink.o   -mcpu=cortex-m7 -mthumb -mfpu=fpv5-d16 -mfloat-abi=hard --specs=nano.specs --specs=nosys.specs -T../../libdaisy/core/STM32H750IB_flash.lds -L../../libdaisy/build  -L ../../DaisySP/build -ldaisy -lc -lm -lnosys -ldaisysp -Wl,-Map=build/Blink.map,--cref -Wl,--gc-sections -o build/Blink.elf
 arm-none-eabi-size build/Blink.elf
@@ -141,7 +150,7 @@ Whenenever there are changes to the libraries (whether from pulling from git or 
 The script does expect that python3 is installed.
 
 One thing that must be kept in mind is that the script does not know where libDaisy/DaisySP
-are located. So all copied/created projects are expected to be two directories up from whereever the libraries are  (e.g. `seed/new_project/`).
+are located. So all copied/created projects are expected to be two directories up from whereever the libraries are (e.g. `seed/new_project/`).
 
 Adding an argument to specify this is planned, but not yet available.
 
