@@ -123,7 +123,7 @@ void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
     // Debounce the button
     button1.Debounce();
 
-    led1.Set(1.f * volumeKnob1Level);
+    led1.Set(1.f * mixKnobLevel);
     led1.Update();
 
     if(button1.Pressed())
@@ -145,50 +145,37 @@ void InitSampler(WavPlayer&  samplerLeft,
                  const char* pathLeft,
                  const char* pathRight)
 {
-    hardware.PrintLine(
-        "Initializing sampler with paths: %s, %s", pathLeft, pathRight);
     samplerLeft.Init(pathLeft);
     samplerRight.Init(pathRight);
     samplerLeft.SetLooping(true);
     samplerRight.SetLooping(true);
-    int a = samplerLeft.Open(0);
-    if(a != 0)
-    {
-        hardware.PrintLine("Failed to open samplerLeft");
-    }
-    if(samplerRight.Open(0) != 0)
-    {
-        hardware.PrintLine("Failed to open samplerRight");
-    }
+    samplerLeft.Open(0);
+    samplerRight.Open(0);
 }
 
 void InitSDCard()
 {
-    // Initialize SD card
     SdmmcHandler::Config sd_cfg;
     sd_cfg.Defaults();
-    // sd_cfg.speed = daisy::SdmmcHandler::Speed::SLOW;
     sd_cfg.width = daisy::SdmmcHandler::BusWidth::BITS_1;
 
     if(sdcard.Init(sd_cfg) != daisy::SdmmcHandler::Result::OK)
     {
-        hardware.PrintLine("Failed to initialize SD card");
         return;
     }
     fsi.Init(FatFSInterface::Config::MEDIA_SD);
 
-    hardware.Print("mount...");
+    hardware.Print("sd card mount...");
     if(FRESULT result = f_mount(&fsi.GetSDFileSystem(), fsi.GetSDPath(), 0))
     {
-        hardware.PrintLine("did not mount - err %d", result);
+        hardware.PrintLine("sd card did not mount - err %d", result);
         asm("bkpt 255");
     }
-    hardware.PrintLine("ok!");
+    hardware.PrintLine("sd card mount ok!");
 }
 
 void InitPotsButtonsAndLED()
 {
-    // Initialize controls and led
     float            samplerate = hardware.AudioSampleRate(); // per second
     AdcChannelConfig adcConfig
         [NUMBER_OF_ADC_CHANNELS]; // Create an array of AdcChannelConfig
@@ -209,7 +196,6 @@ void InitPotsButtonsAndLED()
 
 void BufferSamplers()
 {
-    hardware.PrintLine("Buffering samplers...");
     sampler1Left.Prepare();
     sampler1Right.Prepare();
     sampler2Left.Prepare();
@@ -232,7 +218,6 @@ int main(void)
 {
     hardware.Init();
     hardware.SetAudioBlockSize(256);
-    // hardware.StartLog(true);
 
     InitSDCard();
 
@@ -280,9 +265,7 @@ int main(void)
     InitPotsButtonsAndLED();
 
     // Start audio
-    hardware.Print("starting audio...");
     hardware.StartAudio(AudioCallback);
-    hardware.PrintLine("ok!");
 
     for(;;)
     {

@@ -2,7 +2,7 @@
 TARGET = Surroundings
 
 # Sources
-CPP_SOURCES = Surroundings.cpp
+CPP_SOURCES = src/Surroundings.cpp
 
 # Library Locations
 LIBDAISY_DIR = ../../libDaisy
