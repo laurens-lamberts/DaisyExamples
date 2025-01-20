@@ -2,7 +2,7 @@
 #include <string.h>
 #include "daisy_seed.h"
 #include "daisysp.h"
-// #include "modules/wavplayer/wavplayer.h"
+#include "wavplayer.h"
 
 // Wav files need to be 16 bit - 1 channel (though 2 channels seems fine?) - 48kHz
 

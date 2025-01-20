@@ -2,7 +2,7 @@
 TARGET = Surroundings
 
 # Sources
-CPP_SOURCES = src/Surroundings.cpp
+CPP_SOURCES = src/Surroundings.cpp src/WavPlayer.cpp
 
 # Library Locations
 LIBDAISY_DIR = ../../libDaisy
